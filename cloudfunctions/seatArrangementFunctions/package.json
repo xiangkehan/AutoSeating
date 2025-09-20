@@ -1,0 +1,15 @@
+{
+  "name": "seatArrangementFunctions",
+  "version": "1.0.0",
+  "description": "自动排座位系统云函数",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "wx-server-sdk": "~2.4.0",
+    "jsonwebtoken": "^8.5.1"
+  }
+}

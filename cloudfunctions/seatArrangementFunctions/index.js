@@ -1,6 +1,5 @@
 const cloud = require("wx-server-sdk");
 const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
 
 cloud.init({
   env: cloud.DYNAMIC_CURRENT_ENV,
@@ -18,7 +17,6 @@ const studentModule = require('./modules/student');
 const sessionModule = require('./modules/session');
 const wishModule = require('./modules/wish');
 const resultModule = require('./modules/result');
-const utilsModule = require('./modules/utils');
 
 // 验证JWT令牌
 const verifyToken = (token) => {
@@ -88,57 +86,69 @@ exports.main = async (event, context) => {
       userInfo = tokenResult.data;
     }
     
+    // 依赖注入对象
+    const dependencies = {
+      db,
+      _,
+      getWXContext,
+      generateToken,
+      generateId,
+      createResponse,
+      verifyToken,
+      JWT_SECRET
+    };
+    
     // 路由处理
     switch (type) {
       // ============ 认证相关 ============
       case 'wxLogin':
-        return await authModule.wxLogin(event, { db, getWXContext, generateToken, generateId, createResponse });
+        return await authModule.wxLogin(event, dependencies);
       
       case 'adminLogin':
-        return await authModule.adminLogin(event, { db, generateToken, createResponse });
+        return await authModule.adminLogin(event, dependencies);
       
       case 'refreshToken':
-        return await authModule.refreshToken(event, { verifyToken, generateToken, createResponse });
+        return await authModule.refreshToken(event, dependencies);
       
       // ============ 学生相关 ============
       case 'getStudentProfile':
-        return await studentModule.getProfile(userInfo, { db, createResponse });
+        return await studentModule.getProfile(userInfo, dependencies);
       
       case 'updateStudentProfile':
-        return await studentModule.updateProfile(event, userInfo, { db, createResponse });
+        return await studentModule.updateProfile(event, userInfo, dependencies);
       
       case 'getClassmates':
-        return await studentModule.getClassmates(userInfo, { db, createResponse });
+        return await studentModule.getClassmates(userInfo, dependencies);
       
       case 'getClassList':
-        return await studentModule.getClassList({ db, createResponse });
+        return await studentModule.getClassList(dependencies);
       
       // ============ 会话相关 ============
       case 'getCurrentSession':
-        return await sessionModule.getCurrentSession(event, userInfo, { db, createResponse });
+        return await sessionModule.getCurrentSession(event, userInfo, dependencies);
       
       case 'createSession':
-        return await sessionModule.createSession(event, userInfo, { db, generateId, createResponse });
+        return await sessionModule.createSession(event, userInfo, dependencies);
       
       case 'getSessionStatistics':
-        return await sessionModule.getStatistics(event, userInfo, { db, createResponse });
+        return await sessionModule.getStatistics(event, userInfo, dependencies);
       
       // ============ 意愿相关 ============
       case 'submitWish':
-        return await wishModule.submitWish(event, userInfo, { db, generateId, createResponse });
+        return await wishModule.submitWish(event, userInfo, dependencies);
       
       case 'updateWish':
-        return await wishModule.updateWish(event, userInfo, { db, createResponse });
+        return await wishModule.updateWish(event, userInfo, dependencies);
       
       case 'getMyWish':
-        return await wishModule.getMyWish(event, userInfo, { db, createResponse });
+        return await wishModule.getMyWish(event, userInfo, dependencies);
       
       // ============ 结果相关 ============
       case 'getMyAssignment':
-        return await resultModule.getMyAssignment(event, userInfo, { db, createResponse });
+        return await resultModule.getMyAssignment(event, userInfo, dependencies);
       
       case 'getArrangementResult':
-        return await resultModule.getArrangementResult(event, userInfo, { db, createResponse });
+        return await resultModule.getArrangementResult(event, userInfo, dependencies);
       
       // ============ 原有功能保持兼容 ============
       case 'getOpenId':

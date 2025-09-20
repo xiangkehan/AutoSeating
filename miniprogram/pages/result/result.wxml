@@ -1,0 +1,124 @@
+<!--pages/result/result.wxml-->
+<view class="container">
+  <!-- 加载状态 -->
+  <loading wx:if="{{loading}}">加载中...</loading>
+  
+  <!-- 无结果状态 -->
+  <view wx:elif="{{!hasResult}}" class="no-result">
+    <image class="empty-icon" src="/images/empty-result.png" mode="aspectFit"></image>
+    <text class="empty-title">暂无排座结果</text>
+    <text class="empty-desc">排座尚未完成或结果未发布</text>
+    <button class="refresh-btn" bindtap="loadCurrentSession">刷新</button>
+  </view>
+  
+  <!-- 有结果状态 -->
+  <view wx:else class="result-content">
+    <!-- 我的座位信息 -->
+    <view class="my-seat-card">
+      <view class="card-header">
+        <text class="card-title">我的座位</text>
+        <view class="satisfaction-badge {{getSatisfactionLevel(myAssignment.satisfaction_score)}}">
+          <text class="satisfaction-text">{{getSatisfactionDesc(myAssignment.satisfaction_score)}}</text>
+          <text class="satisfaction-score">{{(myAssignment.satisfaction_score * 100).toFixed(0)}}分</text>
+        </view>
+      </view>
+      
+      <view class="seat-info">
+        <view class="seat-visual">
+          <view class="seat-icon"></view>
+          <text class="seat-position">{{myAssignment.seat_info.position_desc}}</text>
+        </view>
+        
+        <view class="seat-details">
+          <text class="classroom-name">{{classroomLayout.name}}</text>
+          <text class="assign-time">分配时间：{{myAssignment.assign_time}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 邻座信息 -->
+    <view class="neighbors-card">
+      <view class="card-header">
+        <text class="card-title">我的邻座</text>
+      </view>
+      
+      <view class="neighbors-grid">
+        <view class="neighbor-item">
+          <text class="direction">前排</text>
+          <text class="neighbor-name">{{myAssignment.neighbors.front ? myAssignment.neighbors.front.student_name : '无'}}</text>
+          <view wx:if="{{myAssignment.neighbors.front && myAssignment.neighbors.front.is_preferred}}" class="preferred-tag">期望</view>
+        </view>
+        
+        <view class="neighbor-item">
+          <text class="direction">左侧</text>
+          <text class="neighbor-name">{{myAssignment.neighbors.left ? myAssignment.neighbors.left.student_name : '无'}}</text>
+          <view wx:if="{{myAssignment.neighbors.left && myAssignment.neighbors.left.is_preferred}}" class="preferred-tag">期望</view>
+        </view>
+        
+        <view class="neighbor-item center">
+          <view class="my-seat-indicator">我</view>
+        </view>
+        
+        <view class="neighbor-item">
+          <text class="direction">右侧</text>
+          <text class="neighbor-name">{{myAssignment.neighbors.right ? myAssignment.neighbors.right.student_name : '无'}}</text>
+          <view wx:if="{{myAssignment.neighbors.right && myAssignment.neighbors.right.is_preferred}}" class="preferred-tag">期望</view>
+        </view>
+        
+        <view class="neighbor-item">
+          <text class="direction">后排</text>
+          <text class="neighbor-name">{{myAssignment.neighbors.back ? myAssignment.neighbors.back.student_name : '无'}}</text>
+          <view wx:if="{{myAssignment.neighbors.back && myAssignment.neighbors.back.is_preferred}}" class="preferred-tag">期望</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 分配原因 -->
+    <view class="reasons-card">
+      <view class="card-header">
+        <text class="card-title">分配原因</text>
+      </view>
+      
+      <view class="reasons-list">
+        <view wx:for="{{myAssignment.assignment_reasons}}" wx:key="index" class="reason-item">
+          <view class="reason-icon">✓</view>
+          <text class="reason-text">{{item}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 班级座位图预览 -->
+    <view class="seat-map-preview">
+      <view class="card-header">
+        <text class="card-title">班级座位图</text>
+        <button class="view-full-btn" bindtap="onViewStatistics">查看详情</button>
+      </view>
+      
+      <scroll-view class="mini-seat-map" scroll-x="{{true}}">
+        <view class="seat-grid-mini">
+          <view 
+            wx:for="{{seatMap}}" 
+            wx:for-item="row" 
+            wx:for-index="rowIndex"
+            wx:key="rowIndex"
+            class="seat-row"
+          >
+            <view 
+              wx:for="{{row}}" 
+              wx:key="seat_id"
+              class="seat-mini {{item.student ? (item.student.student_id === myAssignment.student_id ? 'my-seat' : 'occupied') : 'empty'}}"
+            >
+              <text class="seat-label">{{item.student ? item.student.name.substr(0,1) : ''}}</text>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="action-buttons">
+      <button class="share-btn" bindtap="onShare">分享结果</button>
+      <button wx:if="{{currentSession.can_modify}}" class="resubmit-btn" bindtap="onResubmit">重新提交</button>
+    </view>
+  </view>
+</view>
