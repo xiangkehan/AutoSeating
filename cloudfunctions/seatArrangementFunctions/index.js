@@ -72,6 +72,14 @@ const generateId = (prefix = '') => {
 // 初始化默认管理员（如果不存在）
 const initDefaultAdmin = async () => {
   try {
+    console.log('开始初始化默认管理员...');
+    
+    // 确保数据库连接正常
+    if (!db) {
+      console.error('数据库实例未初始化');
+      return;
+    }
+    
     // 检查 admins 集合是否存在数据
     const existingAdmins = await db.collection('admins').limit(1).get();
     
@@ -104,51 +112,60 @@ const initDefaultAdmin = async () => {
       });
       
       console.log('默认管理员创建成功:', defaultAdmin.username);
+    } else {
+      console.log('默认管理员已存在，跳过创建');
     }
   } catch (error) {
-    console.log('初始化管理员时出错（可能是首次创建集合）:', error.message);
-    // 如果集合不存在，第一次添加数据时会自动创建
-    try {
-      const defaultAdmin = {
-        admin_id: 'admin_default_' + Date.now(),
-        username: 'admin',
-        password: 'admin123',
-        name: '系统管理员',
-        role: 'seat_manager',
-        permissions: [
-          'create_session',
-          'manage_students', 
-          'execute_arrangement',
-          'manual_adjust',
-          'publish_result',
-          'view_statistics',
-          'manage_users'
-        ],
-        class_ids: [],
-        is_active: true,
-        create_time: new Date().toISOString()
-      };
+    console.error('初始化管理员时出错:', error);
+    // 如果是集合不存在的错误，尝试创建
+    if (error.errCode === -502005 || error.message.includes('collection')) {
+      try {
+        console.log('尝试创建 admins 集合并添加默认管理员...');
+        const defaultAdmin = {
+          admin_id: 'admin_default_' + Date.now(),
+          username: 'admin',
+          password: 'admin123',
+          name: '系统管理员',
+          role: 'seat_manager',
+          permissions: [
+            'create_session',
+            'manage_students', 
+            'execute_arrangement',
+            'manual_adjust',
+            'publish_result',
+            'view_statistics',
+            'manage_users'
+          ],
+          class_ids: [],
+          is_active: true,
+          create_time: new Date().toISOString()
+        };
 
-      await db.collection('admins').add({
-        data: defaultAdmin
-      });
-      
-      console.log('默认管理员创建成功:', defaultAdmin.username);
-    } catch (createError) {
-      console.error('创建默认管理员失败:', createError);
+        await db.collection('admins').add({
+          data: defaultAdmin
+        });
+        
+        console.log('默认管理员创建成功:', defaultAdmin.username);
+      } catch (createError) {
+        console.error('创建默认管理员失败:', createError);
+      }
     }
   }
 };
 
 // 云函数入口函数
 exports.main = async (event, context) => {
-  console.log('Cloud function called with event:', event);
-  
-  // 初始化默认管理员（仅在首次运行或 admins 集合为空时）
-  await initDefaultAdmin();
+  console.log('Cloud function called with event:', JSON.stringify(event, null, 2));
   
   try {
+    // 初始化默认管理员（仅在首次运行或 admins 集合为空时）
+    await initDefaultAdmin();
+    
     const { type } = event;
+    
+    if (!type) {
+      return createResponse(false, null, '缺少请求类型参数', 400);
+    }
     
     // 不需要认证的接口
     const publicEndpoints = ['wxLogin', 'adminLogin', 'refreshToken'];

@@ -42,23 +42,86 @@ Page({
   async loadDashboardData() {
     try {
       const token = wx.getStorageSync('adminToken');
+      if (!token) {
+        console.log('未找到管理员令牌');
+        return;
+      }
+      
       const result = await wx.cloud.callFunction({
         name: 'seatArrangementFunctions',
         data: {
-          action: 'getDashboardStats',
+          type: 'getDashboardStats',
           token
         }
       });
 
-      if (result.result.success) {
+      console.log('仪表盘数据结果:', result);
+
+      if (result.result && result.result.success) {
         const { stats, activities } = result.result.data;
         this.setData({
-          stats,
-          recentActivities: activities
+          stats: stats || this.data.stats,
+          recentActivities: activities || []
         });
+      } else {
+        console.log('加载仪表盘数据失败:', result.result ? result.result.message : '未知错误');
       }
     } catch (error) {
       console.error('加载仪表盘数据失败:', error);
+      // 如果是数据库错误，可能是首次初始化
+      if (error.errCode === -502005) {
+        wx.showModal({
+          title: '提示',
+          content: '检测到系统首次初始化，是否现在初始化数据库？',
+          confirmText: '初始化',
+          cancelText: '取消',
+          success: (res) => {
+            if (res.confirm) {
+              this.initDatabase();
+            }
+          }
+        });
+      }
+    }
+  },
+
+  // 初始化数据库
+  async initDatabase() {
+    wx.showLoading({
+      title: '初始化中...'
+    });
+    
+    try {
+      const result = await wx.cloud.callFunction({
+        name: 'initDatabase',
+        data: {}
+      });
+      
+      wx.hideLoading();
+      
+      if (result.result && result.result.success) {
+        wx.showToast({
+          title: '初始化成功',
+          icon: 'success'
+        });
+        
+        // 重新加载数据
+        setTimeout(() => {
+          this.loadDashboardData();
+        }, 1000);
+      } else {
+        wx.showToast({
+          title: '初始化失败',
+          icon: 'none'
+        });
+      }
+    } catch (error) {
+      wx.hideLoading();
+      console.error('初始化数据库失败:', error);
+      wx.showToast({
+        title: '初始化失败',
+        icon: 'none'
+      });
     }
   },
 

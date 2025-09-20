@@ -43,7 +43,7 @@ Page({
       const result = await wx.cloud.callFunction({
         name: 'seatArrangementFunctions',
         data: {
-          action: 'getClassList',
+          type: 'getClassList',
           token
         }
       });
@@ -65,7 +65,7 @@ Page({
       const result = await wx.cloud.callFunction({
         name: 'seatArrangementFunctions',
         data: {
-          action: 'getColleagueList',
+          type: 'getColleagueList',
           token
         }
       });
@@ -106,7 +106,7 @@ Page({
       const result = await wx.cloud.callFunction({
         name: 'seatArrangementFunctions',
         data: {
-          action: 'getClassroomLayout',
+          type: 'getClassroomLayout',
           classroom_id: classroomId,
           token
         }
@@ -255,7 +255,7 @@ Page({
       const result = await wx.cloud.callFunction({
         name: 'seatArrangementFunctions',
         data: {
-          action: 'submitAdminWish',
+          type: 'submitAdminWish',
           class_id: classList[selectedClassIndex].id,
           wish_data: {
             preferred_seats: preferredSeats.map(s => s.id),
