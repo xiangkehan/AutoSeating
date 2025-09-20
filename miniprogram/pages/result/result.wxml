@@ -19,7 +19,7 @@
         <text class="card-title">我的座位</text>
         <view class="satisfaction-badge {{getSatisfactionLevel(myAssignment.satisfaction_score)}}">
           <text class="satisfaction-text">{{getSatisfactionDesc(myAssignment.satisfaction_score)}}</text>
-          <text class="satisfaction-score">{{(myAssignment.satisfaction_score * 100).toFixed(0)}}分</text>
+          <text class="satisfaction-score">{{satisfactionScore}}分</text>
         </view>
       </view>
       
@@ -108,7 +108,7 @@
               wx:key="seat_id"
               class="seat-mini {{item.student ? (item.student.student_id === myAssignment.student_id ? 'my-seat' : 'occupied') : 'empty'}}"
             >
-              <text class="seat-label">{{item.student ? item.student.name.substr(0,1) : ''}}</text>
+              <text class="seat-label">{{item.studentInitial}}</text>
             </view>
           </view>
         </view>

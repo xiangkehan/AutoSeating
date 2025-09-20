@@ -15,6 +15,7 @@ Page({
       }
     },
     classList: [],
+    selectedClassName: '',
     loading: false,
     submitting: false
   },
@@ -47,6 +48,25 @@ Page({
             other_requirements: ''
           }
         }
+      }, () => {
+        this.updateSelectedClassName();
+      });
+    }
+  },
+
+  // 更新选中的班级名称
+  updateSelectedClassName: function() {
+    const { class_id } = this.data.formData;
+    const { classList } = this.data;
+    
+    if (class_id && classList.length > 0) {
+      const selectedClass = classList.find(item => item.class_id === class_id);
+      this.setData({
+        selectedClassName: selectedClass ? selectedClass.name : ''
+      });
+    } else {
+      this.setData({
+        selectedClassName: ''
       });
     }
   },
@@ -68,6 +88,8 @@ Page({
           that.setData({
             classList: res.result.data.classes || [],
             loading: false
+          }, () => {
+            that.updateSelectedClassName();
           });
         } else {
           that.setData({ loading: false });
@@ -109,6 +131,8 @@ Page({
     
     this.setData({
       'formData.class_id': selectedClass ? selectedClass.class_id : ''
+    }, () => {
+      this.updateSelectedClassName();
     });
   },
 

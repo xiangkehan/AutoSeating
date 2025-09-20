@@ -19,6 +19,8 @@ const wishModule = require('./modules/wish');
 const resultModule = require('./modules/result');
 const algorithmModule = require('./modules/algorithm');
 const adminModule = require('./modules/admin');
+const dataManager = require('./modules/dataManager');
+const { checkPermission, checkCollectionPermission } = require('./modules/permission');
 
 // 验证JWT令牌
 const verifyToken = (token) => {
@@ -171,6 +173,32 @@ exports.main = async (event, context) => {
       
       case 'getArrangementResult':
         return await resultModule.getArrangementResult(event, userInfo, dependencies);
+      
+      // ============ 数据管理（所有人可读，管理员可写） ============
+      case 'getClassList':
+        return await dataManager.getClassList(event, userInfo, dependencies);
+      
+      case 'getClassroomList':
+        return await dataManager.getClassroomList(event, userInfo, dependencies);
+      
+      case 'getStudentInfo':
+        return await dataManager.getStudentInfo(event, userInfo, dependencies);
+      
+      case 'genericRead':
+        return await dataManager.genericRead(event, userInfo, dependencies);
+      
+      // 仅管理员可写操作
+      case 'createClass':
+        return await dataManager.createClass(event, userInfo, dependencies);
+      
+      case 'updateClass':
+        return await dataManager.updateClass(event, userInfo, dependencies);
+      
+      case 'deleteClass':
+        return await dataManager.deleteClass(event, userInfo, dependencies);
+      
+      case 'genericWrite':
+        return await dataManager.genericWrite(event, userInfo, dependencies);
       
       // ============ 原有功能保持兼容 ============
       case 'getOpenId':

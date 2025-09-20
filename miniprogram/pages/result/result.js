@@ -6,7 +6,8 @@ Page({
     loading: true,
     hasResult: false,
     seatMap: [],
-    classroomLayout: null
+    classroomLayout: null,
+    satisfactionScore: '0'
   },
 
   onLoad: function() {
@@ -88,8 +89,12 @@ Page({
       },
       success: (res) => {
         if (res.result.success && res.result.data) {
+          const assignmentData = res.result.data;
+          const score = assignmentData.satisfaction_score || 0;
+          
           that.setData({
-            myAssignment: res.result.data,
+            myAssignment: assignmentData,
+            satisfactionScore: (score * 100).toFixed(0),
             hasResult: true,
             loading: false
           });
@@ -127,8 +132,22 @@ Page({
       },
       success: (res) => {
         if (res.result.success) {
+          const seatMapData = res.result.data.classroom_layout.seat_map || [];
+          
+          // 为每个座位添加学生姓名首字母
+          const processedSeatMap = seatMapData.map(row => {
+            return row.map(seat => {
+              return {
+                ...seat,
+                studentInitial: seat.student && seat.student.name 
+                  ? seat.student.name.charAt(0) 
+                  : ''
+              };
+            });
+          });
+          
           that.setData({
-            seatMap: res.result.data.classroom_layout.seat_map || []
+            seatMap: processedSeatMap
           });
         }
       },
