@@ -1,0 +1,99 @@
+<!--管理员仪表盘页面-->
+<view class="dashboard-container">
+  <!-- 头部信息 -->
+  <view class="header">
+    <view class="welcome">
+      <text class="title">欢迎，{{adminInfo.name}}</text>
+      <text class="role">{{getRoleText(adminInfo.role)}}</text>
+    </view>
+    <view class="logout" bindtap="onLogout">
+      <text>退出登录</text>
+    </view>
+  </view>
+
+  <!-- 统计信息 -->
+  <view class="stats-section">
+    <view class="stats-title">系统概览</view>
+    <view class="stats-grid">
+      <view class="stat-item">
+        <text class="stat-number">{{stats.activeSession || 0}}</text>
+        <text class="stat-label">活跃会话</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-number">{{stats.totalStudents || 0}}</text>
+        <text class="stat-label">学生总数</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-number">{{stats.completedArrangements || 0}}</text>
+        <text class="stat-label">已完成排座</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-number">{{stats.totalWishes || 0}}</text>
+        <text class="stat-label">意愿总数</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 功能模块 -->
+  <view class="modules-section">
+    <view class="module-title">功能模块</view>
+    
+    <!-- 基础管理功能 -->
+    <view class="module-group">
+      <view class="group-title">基础管理</view>
+      <view class="module-grid">
+        <view class="module-item" bindtap="navigateTo" data-page="admin-wish">
+          <view class="module-icon">📝</view>
+          <text class="module-name">参与排座</text>
+          <text class="module-desc">填写个人意愿</text>
+        </view>
+        <view class="module-item" bindtap="navigateTo" data-page="view-results">
+          <view class="module-icon">📊</view>
+          <text class="module-name">查看结果</text>
+          <text class="module-desc">排座结果查看</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 排座管理功能 (仅排座负责人可见) -->
+    <view class="module-group" wx:if="{{adminInfo.role === 'seat_manager'}}">
+      <view class="group-title">排座管理</view>
+      <view class="module-grid">
+        <view class="module-item" bindtap="navigateTo" data-page="session-management">
+          <view class="module-icon">⚙️</view>
+          <text class="module-name">会话管理</text>
+          <text class="module-desc">创建和管理排座会话</text>
+        </view>
+        <view class="module-item" bindtap="navigateTo" data-page="student-management">
+          <view class="module-icon">👥</view>
+          <text class="module-name">学生管理</text>
+          <text class="module-desc">维护学生信息</text>
+        </view>
+        <view class="module-item" bindtap="navigateTo" data-page="classroom-management">
+          <view class="module-icon">🏫</view>
+          <text class="module-name">教室管理</text>
+          <text class="module-desc">配置教室布局</text>
+        </view>
+        <view class="module-item" bindtap="navigateTo" data-page="execute-arrangement">
+          <view class="module-icon">🎯</view>
+          <text class="module-name">执行排座</text>
+          <text class="module-desc">运行排座算法</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 最近活动 -->
+  <view class="activity-section">
+    <view class="activity-title">最近活动</view>
+    <view class="activity-list">
+      <view class="activity-item" wx:for="{{recentActivities}}" wx:key="id">
+        <view class="activity-time">{{item.time}}</view>
+        <view class="activity-content">{{item.content}}</view>
+      </view>
+      <view class="no-activity" wx:if="{{!recentActivities.length}}">
+        <text>暂无最近活动</text>
+      </view>
+    </view>
+  </view>
+</view>

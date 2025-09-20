@@ -1,0 +1,146 @@
+<!--管理员意愿填写专用页面-->
+<view class="admin-wish-container">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <text class="title">管理员意愿填写</text>
+    <text class="subtitle">作为参与排座的管理员，请填写您的座位偏好</text>
+  </view>
+
+  <!-- 管理员身份标识 -->
+  <view class="admin-badge">
+    <view class="badge-icon">👨‍💼</view>
+    <view class="badge-info">
+      <text class="name">{{adminInfo.name}}</text>
+      <text class="role">{{getRoleText(adminInfo.role)}}</text>
+    </view>
+  </view>
+
+  <!-- 基本信息 -->
+  <view class="info-section">
+    <view class="section-title">基本信息</view>
+    <view class="info-item">
+      <text class="label">参与班级</text>
+      <picker range="{{classList}}" range-key="name" value="{{selectedClassIndex}}" bindchange="onClassChange">
+        <view class="picker">
+          {{selectedClassIndex >= 0 ? classList[selectedClassIndex].name : '请选择班级'}}
+        </view>
+      </picker>
+    </view>
+  </view>
+
+  <!-- 座位偏好选择 -->
+  <view class="preference-section">
+    <view class="section-title">座位偏好</view>
+    <view class="preference-tabs">
+      <view 
+        class="tab {{currentTab === 'prefer' ? 'active' : ''}}" 
+        bindtap="switchTab" 
+        data-tab="prefer"
+      >
+        偏好座位
+      </view>
+      <view 
+        class="tab {{currentTab === 'avoid' ? 'active' : ''}}" 
+        bindtap="switchTab" 
+        data-tab="avoid"
+      >
+        避免座位
+      </view>
+    </view>
+
+    <!-- 座位图 -->
+    <view class="seat-map-container">
+      <view class="classroom-layout">
+        <!-- 讲台 -->
+        <view class="podium">讲台</view>
+        
+        <!-- 座位网格 -->
+        <view class="seats-grid">
+          <view 
+            class="seat {{getSeatClass(seat)}}" 
+            wx:for="{{seatLayout}}" 
+            wx:key="id"
+            bindtap="onSeatTap"
+            data-seat="{{seat}}"
+          >
+            {{seat.row}}{{seat.col}}
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 偏好说明 -->
+    <view class="preference-tips">
+      <view class="tip-item">
+        <view class="tip-color prefer"></view>
+        <text>偏好座位 - 希望安排的位置</text>
+      </view>
+      <view class="tip-item">
+        <view class="tip-color avoid"></view>
+        <text>避免座位 - 不希望安排的位置</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 人际关系偏好 -->
+  <view class="relationship-section">
+    <view class="section-title">人际关系偏好</view>
+    
+    <view class="relationship-item">
+      <text class="relationship-label">希望邻近的同事</text>
+      <view class="colleague-list">
+        <view 
+          class="colleague-tag {{colleague.selected ? 'selected' : ''}}"
+          wx:for="{{colleagueList}}" 
+          wx:key="id"
+          bindtap="toggleColleague"
+          data-id="{{colleague.id}}"
+        >
+          {{colleague.name}}
+        </view>
+      </view>
+    </view>
+
+    <view class="relationship-item">
+      <text class="relationship-label">希望避开的同事</text>
+      <view class="colleague-list">
+        <view 
+          class="colleague-tag avoid {{colleague.selected ? 'selected' : ''}}"
+          wx:for="{{avoidColleagueList}}" 
+          wx:key="id"
+          bindtap="toggleAvoidColleague"
+          data-id="{{colleague.id}}"
+        >
+          {{colleague.name}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 特殊需求 -->
+  <view class="special-section">
+    <view class="section-title">特殊需求</view>
+    <textarea 
+      class="special-input" 
+      placeholder="请填写特殊座位需求（如视力、听力等健康原因）"
+      value="{{specialRequirements}}"
+      bindinput="onSpecialInput"
+      maxlength="200"
+    ></textarea>
+    <view class="char-count">{{specialRequirements.length}}/200</view>
+  </view>
+
+  <!-- 提交按钮 -->
+  <view class="submit-section">
+    <button 
+      class="submit-btn {{isSubmitting ? 'submitting' : ''}}" 
+      bindtap="submitWish"
+      disabled="{{isSubmitting}}"
+    >
+      {{isSubmitting ? '提交中...' : '提交意愿'}}
+    </button>
+    <view class="submit-tip">
+      * 提交后可在会话结束前重新修改
+    </view>
+  </view>
+</view>

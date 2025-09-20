@@ -6,6 +6,9 @@
     "pages/neighbor-preference/neighbor-preference",
     "pages/wish-submit/wish-submit",
     "pages/result/result",
+    "pages/admin-login/admin-login",
+    "pages/admin-dashboard/admin-dashboard",
+    "pages/admin-wish/admin-wish",
     "pages/index/index",
     "pages/example/index"
   ],

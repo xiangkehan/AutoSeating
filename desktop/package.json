@@ -1,0 +1,64 @@
+{
+  "name": "seat-arrangement-desktop",
+  "version": "1.0.0",
+  "description": "自动排座位系统 - Win11桌面版",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "build-win": "electron-builder --win",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder --publish=never"
+  },
+  "keywords": [
+    "seat-arrangement",
+    "electron",
+    "desktop",
+    "education"
+  ],
+  "author": "Seat Arrangement Team",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^22.0.0",
+    "electron-builder": "^24.0.0"
+  },
+  "dependencies": {
+    "sqlite3": "^5.1.6",
+    "axios": "^1.4.0",
+    "xlsx": "^0.18.5",
+    "electron-store": "^8.1.0",
+    "path": "^0.12.7",
+    "fs-extra": "^11.1.1"
+  },
+  "build": {
+    "appId": "com.seatarrangement.desktop",
+    "productName": "自动排座位系统",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}

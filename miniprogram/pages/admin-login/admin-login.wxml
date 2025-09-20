@@ -1,0 +1,48 @@
+<!--管理员登录页面-->
+<view class="login-container">
+  <view class="login-header">
+    <text class="title">管理员登录</text>
+    <text class="subtitle">自动排座位系统</text>
+  </view>
+  
+  <view class="login-form">
+    <view class="form-group">
+      <text class="label">用户名</text>
+      <input 
+        class="input" 
+        type="text" 
+        placeholder="请输入管理员用户名"
+        value="{{username}}" 
+        bindinput="onUsernameInput"
+      />
+    </view>
+    
+    <view class="form-group">
+      <text class="label">密码</text>
+      <input 
+        class="input" 
+        type="password" 
+        placeholder="请输入密码"
+        value="{{password}}" 
+        bindinput="onPasswordInput"
+      />
+    </view>
+    
+    <button 
+      class="login-btn {{isLoading ? 'loading' : ''}}" 
+      bindtap="onLogin"
+      disabled="{{isLoading}}"
+    >
+      {{isLoading ? '登录中...' : '登录'}}
+    </button>
+  </view>
+  
+  <view class="login-tips">
+    <text class="tip">• 管理员账号由系统管理员分配</text>
+    <text class="tip">• 如有问题请联系系统管理员</text>
+  </view>
+  
+  <view class="back-to-student">
+    <button class="back-btn" bindtap="backToStudent">返回学生端</button>
+  </view>
+</view>

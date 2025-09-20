@@ -18,6 +18,7 @@ const sessionModule = require('./modules/session');
 const wishModule = require('./modules/wish');
 const resultModule = require('./modules/result');
 const algorithmModule = require('./modules/algorithm');
+const adminModule = require('./modules/admin');
 
 // 验证JWT令牌
 const verifyToken = (token) => {
@@ -147,6 +148,22 @@ exports.main = async (event, context) => {
       
       case 'getMyWish':
         return await wishModule.getMyWish(event, userInfo, dependencies);
+      
+      // ============ 管理员相关 ============
+      case 'getDashboardStats':
+        return await adminModule.getDashboardStats(event, userInfo, dependencies);
+      
+      case 'getColleagueList':
+        return await adminModule.getColleagueList(event, userInfo, dependencies);
+      
+      case 'submitAdminWish':
+        return await adminModule.submitAdminWish(event, userInfo, dependencies);
+      
+      case 'createArrangementSession':
+        return await adminModule.createSession(event, userInfo, dependencies);
+      
+      case 'executeAdminArrangement':
+        return await adminModule.executeArrangement(event, userInfo, dependencies);
       
       // ============ 结果相关 ============
       case 'getMyAssignment':

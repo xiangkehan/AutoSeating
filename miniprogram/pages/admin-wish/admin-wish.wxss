@@ -1,0 +1,291 @@
+/* 管理员意愿填写页面样式 */
+.admin-wish-container {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding-bottom: 120rpx;
+}
+
+/* 页面头部 */
+.page-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 60rpx 30rpx 40rpx;
+  color: white;
+  text-align: center;
+}
+
+.title {
+  display: block;
+  font-size: 40rpx;
+  font-weight: bold;
+  margin-bottom: 16rpx;
+}
+
+.subtitle {
+  font-size: 26rpx;
+  opacity: 0.9;
+}
+
+/* 管理员身份标识 */
+.admin-badge {
+  background: white;
+  margin: 20rpx;
+  border-radius: 12rpx;
+  padding: 30rpx;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+  border-left: 6rpx solid #1976D2;
+}
+
+.badge-icon {
+  font-size: 60rpx;
+  margin-right: 20rpx;
+}
+
+.badge-info .name {
+  display: block;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.badge-info .role {
+  font-size: 24rpx;
+  color: #1976D2;
+}
+
+/* 通用区块样式 */
+.info-section,
+.preference-section,
+.relationship-section,
+.special-section {
+  background: white;
+  margin: 20rpx;
+  border-radius: 12rpx;
+  padding: 30rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 30rpx;
+}
+
+/* 基本信息 */
+.info-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.label {
+  font-size: 28rpx;
+  color: #333;
+  width: 160rpx;
+}
+
+.picker {
+  flex: 1;
+  padding: 20rpx;
+  background: #f8f9fa;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  color: #333;
+}
+
+/* 座位偏好选择 */
+.preference-tabs {
+  display: flex;
+  margin-bottom: 30rpx;
+}
+
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 20rpx;
+  background: #f8f9fa;
+  color: #666;
+  font-size: 28rpx;
+  border-radius: 8rpx;
+  margin-right: 10rpx;
+}
+
+.tab:last-child {
+  margin-right: 0;
+}
+
+.tab.active {
+  background: #1976D2;
+  color: white;
+}
+
+/* 座位图 */
+.seat-map-container {
+  margin: 30rpx 0;
+}
+
+.classroom-layout {
+  background: #f8f9fa;
+  border-radius: 12rpx;
+  padding: 30rpx;
+}
+
+.podium {
+  background: #333;
+  color: white;
+  text-align: center;
+  padding: 20rpx;
+  border-radius: 8rpx;
+  margin-bottom: 30rpx;
+  font-size: 24rpx;
+}
+
+.seats-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 8rpx;
+}
+
+.seat {
+  aspect-ratio: 1;
+  background: #e0e0e0;
+  border-radius: 6rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20rpx;
+  color: #666;
+  border: 2rpx solid transparent;
+}
+
+.seat.prefer {
+  background: #4CAF50;
+  color: white;
+}
+
+.seat.avoid {
+  background: #f44336;
+  color: white;
+}
+
+/* 偏好说明 */
+.preference-tips {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20rpx;
+}
+
+.tip-item {
+  display: flex;
+  align-items: center;
+  font-size: 24rpx;
+  color: #666;
+}
+
+.tip-color {
+  width: 20rpx;
+  height: 20rpx;
+  border-radius: 4rpx;
+  margin-right: 8rpx;
+}
+
+.tip-color.prefer {
+  background: #4CAF50;
+}
+
+.tip-color.avoid {
+  background: #f44336;
+}
+
+/* 人际关系偏好 */
+.relationship-item {
+  margin-bottom: 30rpx;
+}
+
+.relationship-label {
+  display: block;
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 16rpx;
+}
+
+.colleague-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.colleague-tag {
+  padding: 16rpx 24rpx;
+  background: #f8f9fa;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  color: #666;
+}
+
+.colleague-tag.selected {
+  background: #e3f2fd;
+  border-color: #1976D2;
+  color: #1976D2;
+}
+
+.colleague-tag.avoid.selected {
+  background: #ffebee;
+  border-color: #f44336;
+  color: #f44336;
+}
+
+/* 特殊需求 */
+.special-input {
+  width: 100%;
+  min-height: 120rpx;
+  background: #f8f9fa;
+  border-radius: 8rpx;
+  padding: 20rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+}
+
+.char-count {
+  text-align: right;
+  font-size: 22rpx;
+  color: #999;
+  margin-top: 8rpx;
+}
+
+/* 提交区域 */
+.submit-section {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  padding: 30rpx;
+  box-shadow: 0 -2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+.submit-btn {
+  width: 100%;
+  height: 80rpx;
+  background: #1976D2;
+  color: white;
+  border: none;
+  border-radius: 12rpx;
+  font-size: 30rpx;
+  font-weight: 500;
+}
+
+.submit-btn.submitting {
+  background: #ccc;
+}
+
+.submit-tip {
+  text-align: center;
+  font-size: 22rpx;
+  color: #999;
+  margin-top: 8rpx;
+}
