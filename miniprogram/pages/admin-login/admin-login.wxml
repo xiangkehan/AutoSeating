@@ -40,6 +40,18 @@
   <view class="login-tips">
     <text class="tip">• 管理员账号由系统管理员分配</text>
     <text class="tip">• 如有问题请联系系统管理员</text>
+    <text class="tip">• 首次部署请先初始化数据库</text>
+  </view>
+  
+  <view class="init-section">
+    <button 
+      class="init-btn {{isInitializing ? 'loading' : ''}}" 
+      bindtap="initDatabase"
+      disabled="{{isInitializing}}"
+    >
+      {{isInitializing ? '初始化中...' : '初始化数据库'}}
+    </button>
+    <text class="init-tip">首次使用或数据库为空时点击此按钮</text>
   </view>
   
   <view class="back-to-student">

@@ -180,20 +180,25 @@ const adminLogin = async (event, { db, generateToken, createResponse }) => {
     };
     
     // 记录登录日志
-    await db.collection('system_logs').add({
-      data: {
-        log_id: `log_${Date.now()}`,
-        user_id: adminData.admin_id,
-        user_type: 'admin',
-        action: 'admin_login',
-        details: {
-          username: username,
-          login_type: loginType
-        },
-        result: 'success',
-        create_time: new Date().toISOString()
-      }
-    });
+    try {
+      await db.collection('system_logs').add({
+        data: {
+          log_id: `log_${Date.now()}`,
+          user_id: adminData.admin_id,
+          user_type: 'admin',
+          action: 'admin_login',
+          details: {
+            username: username,
+            login_type: loginType
+          },
+          result: 'success',
+          create_time: new Date().toISOString()
+        }
+      });
+    } catch (logError) {
+      // 如果日志集合不存在，不影响登录流程
+      console.warn('Failed to write login log:', logError.message);
+    }
     
     return createResponse(true, {
       token: token,

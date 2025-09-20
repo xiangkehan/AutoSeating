@@ -81,6 +81,24 @@ exports.main = async (event, context) => {
       data: sampleClassroom
     });
 
+    // 创建 system_logs 集合（系统日志）
+    const initLog = {
+      log_id: 'log_init_' + Date.now(),
+      user_id: 'system',
+      user_type: 'system',
+      action: 'system_init',
+      details: {
+        message: '系统初始化完成',
+        collections_created: ['admins', 'classes', 'classrooms', 'system_logs']
+      },
+      result: 'success',
+      create_time: new Date().toISOString()
+    };
+
+    await db.collection('system_logs').add({
+      data: initLog
+    });
+
     return {
       success: true,
       message: '默认管理员创建成功',

@@ -3,7 +3,8 @@ Page({
   data: {
     username: '',
     password: '',
-    isLoading: false
+    isLoading: false,
+    isInitializing: false  // 初始化状态
   },
 
   onLoad() {
@@ -15,7 +16,8 @@ Page({
   onUnload() {
     // 页面销毁时清理资源
     this.setData({
-      isLoading: false
+      isLoading: false,
+      isInitializing: false
     });
   },
 
@@ -78,11 +80,9 @@ Page({
 
         // 跳转到管理员仪表盘
         setTimeout(() => {
-          if (this.data.isLoading) { // 检查页面是否还在加载状态
-            wx.redirectTo({
-              url: '/pages/admin-dashboard/admin-dashboard'
-            });
-          }
+          wx.redirectTo({
+            url: '/pages/admin-dashboard/admin-dashboard'
+          });
         }, 1500);
       } else {
         const message = (result.result && result.result.message) || '登录失败';
@@ -163,6 +163,13 @@ Page({
 
   // 初始化数据库（根据项目记忆使用 initAdmin 云函数）
   async initDatabase() {
+    // 防止重复点击
+    if (this.data.isInitializing) {
+      return;
+    }
+    
+    this.setData({ isInitializing: true });
+    
     wx.showLoading({
       title: '初始化中...'
     });
@@ -197,10 +204,29 @@ Page({
         });
       } else {
         const message = (result.result && result.result.message) || '初始化失败';
-        wx.showToast({
-          title: message,
-          icon: 'none'
-        });
+        if (message.includes('已存在') || message.includes('默认管理员已存在')) {
+          // 如果管理员已存在，提示用户直接登录
+          wx.showModal({
+            title: '系统已初始化',
+            content: '数据库已初始化完成，请使用以下默认账号登录：\n\n用户名：admin\n密码：admin123',
+            showCancel: false,
+            confirmText: '立即登录',
+            success: () => {
+              this.setData({
+                username: 'admin',
+                password: 'admin123'
+              }, () => {
+                // 自动触发登录
+                this.onLogin();
+              });
+            }
+          });
+        } else {
+          wx.showToast({
+            title: message,
+            icon: 'none'
+          });
+        }
       }
     } catch (error) {
       wx.hideLoading();
@@ -208,13 +234,20 @@ Page({
       
       let errorMessage = '初始化失败';
       if (error.errMsg && error.errMsg.includes('FunctionName parameter could not be found')) {
-        errorMessage = '初始化云函数未找到，请确保 initAdmin 云函数已上传';
+        errorMessage = 'initAdmin 云函数未找到，请确保已上传云函数';
+      } else if (error.errMsg && error.errMsg.includes('Environment not found')) {
+        errorMessage = '云环境未找到，请检查云开发配置';
       }
       
       wx.showToast({
         title: errorMessage,
         icon: 'none'
       });
+    } finally {
+      // 确保加载状态被正确清除
+      if (this.data) {
+        this.setData({ isInitializing: false });
+      }
     }
   }
 });
