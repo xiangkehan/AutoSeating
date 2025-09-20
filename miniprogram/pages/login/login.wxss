@@ -108,6 +108,22 @@
   color: #999;
 }
 
+.admin-btn {
+  width: 100%;
+  background: transparent;
+  color: #ffffff;
+  border: 2rpx solid rgba(255, 255, 255, 0.5);
+  border-radius: 50rpx;
+  padding: 26rpx;
+  font-size: 28rpx;
+  margin-bottom: 30rpx;
+  transition: all 0.3s ease;
+}
+
+.admin-btn:active {
+  background: rgba(255, 255, 255, 0.1);
+}
+
 .login-tips {
   font-size: 24rpx;
   color: rgba(255, 255, 255, 0.6);

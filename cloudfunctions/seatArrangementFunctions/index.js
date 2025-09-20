@@ -69,9 +69,83 @@ const generateId = (prefix = '') => {
   return `${prefix}${timestamp}_${random}`;
 };
 
+// 初始化默认管理员（如果不存在）
+const initDefaultAdmin = async () => {
+  try {
+    // 检查 admins 集合是否存在数据
+    const existingAdmins = await db.collection('admins').limit(1).get();
+    
+    if (existingAdmins.data.length === 0) {
+      console.log('正在创建默认管理员...');
+      
+      // 创建默认管理员
+      const defaultAdmin = {
+        admin_id: 'admin_default_' + Date.now(),
+        username: 'admin',
+        password: 'admin123', // 实际项目中应该加密
+        name: '系统管理员',
+        role: 'seat_manager',
+        permissions: [
+          'create_session',
+          'manage_students', 
+          'execute_arrangement',
+          'manual_adjust',
+          'publish_result',
+          'view_statistics',
+          'manage_users'
+        ],
+        class_ids: [],
+        is_active: true,
+        create_time: new Date().toISOString()
+      };
+
+      await db.collection('admins').add({
+        data: defaultAdmin
+      });
+      
+      console.log('默认管理员创建成功:', defaultAdmin.username);
+    }
+  } catch (error) {
+    console.log('初始化管理员时出错（可能是首次创建集合）:', error.message);
+    // 如果集合不存在，第一次添加数据时会自动创建
+    try {
+      const defaultAdmin = {
+        admin_id: 'admin_default_' + Date.now(),
+        username: 'admin',
+        password: 'admin123',
+        name: '系统管理员',
+        role: 'seat_manager',
+        permissions: [
+          'create_session',
+          'manage_students', 
+          'execute_arrangement',
+          'manual_adjust',
+          'publish_result',
+          'view_statistics',
+          'manage_users'
+        ],
+        class_ids: [],
+        is_active: true,
+        create_time: new Date().toISOString()
+      };
+
+      await db.collection('admins').add({
+        data: defaultAdmin
+      });
+      
+      console.log('默认管理员创建成功:', defaultAdmin.username);
+    } catch (createError) {
+      console.error('创建默认管理员失败:', createError);
+    }
+  }
+};
+
 // 云函数入口函数
 exports.main = async (event, context) => {
   console.log('Cloud function called with event:', event);
+  
+  // 初始化默认管理员（仅在首次运行或 admins 集合为空时）
+  await initDefaultAdmin();
   
   try {
     const { type } = event;

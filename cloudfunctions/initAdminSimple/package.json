@@ -1,0 +1,9 @@
+{
+  "name": "initAdminSimple",
+  "version": "1.0.0",
+  "description": "简化版管理员初始化云函数",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "latest"
+  }
+}

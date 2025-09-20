@@ -149,6 +149,13 @@ Page({
     });
   },
 
+  // 跳转到管理员登录
+  navigateToAdmin: function() {
+    wx.navigateTo({
+      url: '/pages/admin-login/admin-login'
+    });
+  },
+
   // 退出登录
   onLogout: function() {
     wx.showModal({

@@ -63,6 +63,7 @@
     </view>
 
     <view class="action-section">
+      <button class="admin-login-btn" bindtap="onAdminLogin">管理员登录</button>
       <button class="logout-btn" bindtap="onLogout">退出登录</button>
     </view>
   </view>

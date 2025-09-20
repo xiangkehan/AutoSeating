@@ -47,6 +47,10 @@
         <text wx:else>登录中...</text>
       </button>
       
+      <button class="admin-btn" bindtap="navigateToAdmin">
+        管理员登录
+      </button>
+      
       <view class="login-tips">
         <text>登录即表示同意</text>
         <text class="link">《用户协议》</text>

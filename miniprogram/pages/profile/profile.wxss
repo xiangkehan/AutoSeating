@@ -308,6 +308,18 @@
 /* 操作区域 */
 .action-section {
   margin-top: 40rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.admin-login-btn {
+  width: 100%;
+  background: #FF9800;
+  color: #ffffff;
+  border-radius: 50rpx;
+  padding: 30rpx;
+  font-size: 32rpx;
 }
 
 .logout-btn {
