@@ -1,0 +1,269 @@
+<!--排座会话管理页面-->
+<view class="session-management-container">
+  <!-- 页面头部 -->
+  <view class="page-header">
+    <text class="title">排座会话管理</text>
+    <text class="subtitle">创建和管理排座会话</text>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="action-bar">
+    <button class="create-btn" bindtap="showCreateModal">
+      <text class="btn-icon">+</text>
+      <text>创建新会话</text>
+    </button>
+    <button class="refresh-btn" bindtap="refreshSessions">
+      <text class="btn-icon">↻</text>
+      <text>刷新</text>
+    </button>
+  </view>
+
+  <!-- 会话列表 -->
+  <view class="sessions-section">
+    <view class="section-title">会话列表</view>
+    
+    <view class="session-list">
+      <view 
+        class="session-item {{session.status}}" 
+        wx:for="{{sessionList}}" 
+        wx:key="session_id"
+        bindtap="selectSession"
+        data-session="{{session}}"
+      >
+        <view class="session-header">
+          <view class="session-name">{{session.name}}</view>
+          <view class="session-status status-{{session.status}}">
+            {{getStatusText(session.status)}}
+          </view>
+        </view>
+        
+        <view class="session-info">
+          <view class="info-item">
+            <text class="label">班级：</text>
+            <text class="value">{{session.class_name || session.class_id}}</text>
+          </view>
+          <view class="info-item">
+            <text class="label">教室：</text>
+            <text class="value">{{session.classroom_name || session.classroom_id}}</text>
+          </view>
+          <view class="info-item">
+            <text class="label">截止时间：</text>
+            <text class="value">{{formatDate(session.deadline)}}</text>
+          </view>
+        </view>
+        
+        <view class="session-stats">
+          <view class="stat-item">
+            <text class="stat-number">{{session.wish_count || 0}}</text>
+            <text class="stat-label">意愿数</text>
+          </view>
+          <view class="stat-item">
+            <text class="stat-number">{{session.assignment_count || 0}}</text>
+            <text class="stat-label">已分配</text>
+          </view>
+        </view>
+        
+        <view class="session-actions">
+          <button 
+            class="action-btn view-btn" 
+            bindtap="viewSession"
+            data-session-id="{{session.session_id}}"
+          >
+            查看详情
+          </button>
+          <button 
+            class="action-btn execute-btn" 
+            bindtap="executeArrangement"
+            data-session-id="{{session.session_id}}"
+            wx:if="{{session.status === 'active'}}"
+          >
+            执行排座
+          </button>
+          <button 
+            class="action-btn publish-btn" 
+            bindtap="publishResult"
+            data-session-id="{{session.session_id}}"
+            wx:if="{{session.status === 'completed'}}"
+          >
+            发布结果
+          </button>
+        </view>
+      </view>
+      
+      <view class="no-sessions" wx:if="{{!sessionList.length}}">
+        <text>暂无排座会话</text>
+        <text class="sub-text">点击上方按钮创建新的排座会话</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 创建会话弹窗 -->
+  <view class="modal-overlay {{showCreateModal ? 'show' : ''}}" bindtap="hideCreateModal">
+    <view class="modal-content" catchtap="">
+      <view class="modal-header">
+        <text class="modal-title">创建排座会话</text>
+        <view class="close-btn" bindtap="hideCreateModal">×</view>
+      </view>
+      
+      <view class="modal-body">
+        <view class="form-group">
+          <text class="form-label">会话名称</text>
+          <input 
+            class="form-input" 
+            placeholder="请输入会话名称"
+            value="{{newSession.name}}"
+            bindinput="onSessionNameInput"
+          />
+        </view>
+        
+        <view class="form-group">
+          <text class="form-label">选择班级</text>
+          <picker 
+            range="{{classList}}" 
+            range-key="name" 
+            value="{{newSession.classIndex}}"
+            bindchange="onClassChange"
+          >
+            <view class="picker">
+              {{newSession.classIndex >= 0 ? classList[newSession.classIndex].name : '请选择班级'}}
+            </view>
+          </picker>
+        </view>
+        
+        <view class="form-group">
+          <text class="form-label">选择教室</text>
+          <picker 
+            range="{{classroomList}}" 
+            range-key="name" 
+            value="{{newSession.classroomIndex}}"
+            bindchange="onClassroomChange"
+          >
+            <view class="picker">
+              {{newSession.classroomIndex >= 0 ? classroomList[newSession.classroomIndex].name : '请选择教室'}}
+            </view>
+          </picker>
+        </view>
+        
+        <view class="form-group">
+          <text class="form-label">截止时间</text>
+          <picker 
+            mode="datetime" 
+            value="{{newSession.deadline}}"
+            bindchange="onDeadlineChange"
+          >
+            <view class="picker">
+              {{newSession.deadline || '请选择截止时间'}}
+            </view>
+          </picker>
+        </view>
+        
+        <view class="form-group">
+          <text class="form-label">算法配置</text>
+          <view class="algorithm-config">
+            <view class="config-item">
+              <text class="config-label">座位偏好权重</text>
+              <slider 
+                value="{{newSession.config.seatWeight}}" 
+                min="0" 
+                max="100" 
+                show-value
+                bindchange="onConfigChange"
+                data-key="seatWeight"
+              />
+            </view>
+            <view class="config-item">
+              <text class="config-label">人际关系权重</text>
+              <slider 
+                value="{{newSession.config.relationWeight}}" 
+                min="0" 
+                max="100" 
+                show-value
+                bindchange="onConfigChange"
+                data-key="relationWeight"
+              />
+            </view>
+            <view class="config-item">
+              <text class="config-label">特殊需求权重</text>
+              <slider 
+                value="{{newSession.config.specialWeight}}" 
+                min="0" 
+                max="100" 
+                show-value
+                bindchange="onConfigChange"
+                data-key="specialWeight"
+              />
+            </view>
+          </view>
+        </view>
+      </view>
+      
+      <view class="modal-footer">
+        <button class="cancel-btn" bindtap="hideCreateModal">取消</button>
+        <button class="confirm-btn" bindtap="createSession">创建会话</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 会话详情弹窗 -->
+  <view class="modal-overlay {{showDetailModal ? 'show' : ''}}" bindtap="hideDetailModal">
+    <view class="modal-content large" catchtap="">
+      <view class="modal-header">
+        <text class="modal-title">会话详情</text>
+        <view class="close-btn" bindtap="hideDetailModal">×</view>
+      </view>
+      
+      <view class="modal-body" wx:if="{{selectedSession}}">
+        <view class="detail-section">
+          <view class="detail-title">基本信息</view>
+          <view class="detail-grid">
+            <view class="detail-item">
+              <text class="detail-label">会话名称</text>
+              <text class="detail-value">{{selectedSession.name}}</text>
+            </view>
+            <view class="detail-item">
+              <text class="detail-label">状态</text>
+              <text class="detail-value status-{{selectedSession.status}}">
+                {{getStatusText(selectedSession.status)}}
+              </text>
+            </view>
+            <view class="detail-item">
+              <text class="detail-label">创建时间</text>
+              <text class="detail-value">{{formatDate(selectedSession.create_time)}}</text>
+            </view>
+            <view class="detail-item">
+              <text class="detail-label">截止时间</text>
+              <text class="detail-value">{{formatDate(selectedSession.deadline)}}</text>
+            </view>
+          </view>
+        </view>
+        
+        <view class="detail-section">
+          <view class="detail-title">统计信息</view>
+          <view class="stats-grid">
+            <view class="stats-item">
+              <text class="stats-number">{{sessionStats.totalStudents}}</text>
+              <text class="stats-label">总学生数</text>
+            </view>
+            <view class="stats-item">
+              <text class="stats-number">{{sessionStats.submittedWishes}}</text>
+              <text class="stats-label">已提交意愿</text>
+            </view>
+            <view class="stats-item">
+              <text class="stats-number">{{sessionStats.completedAssignments}}</text>
+              <text class="stats-label">已分配座位</text>
+            </view>
+            <view class="stats-item">
+              <text class="stats-number">{{Math.round(sessionStats.completionRate)}}%</text>
+              <text class="stats-label">完成率</text>
+            </view>
+          </view>
+        </view>
+      </view>
+      
+      <view class="modal-footer">
+        <button class="action-btn" bindtap="exportSessionData">导出数据</button>
+        <button class="action-btn primary" bindtap="manageSession">管理会话</button>
+      </view>
+    </view>
+  </view>
+</view>
