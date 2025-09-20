@@ -1,0 +1,76 @@
+<!--pages/login/login.wxml-->
+<view class="container">
+  <!-- 未登录状态 -->
+  <view wx:if="{{!isLoggedIn}}" class="login-container">
+    <!-- Logo和标题 -->
+    <view class="header">
+      <image class="logo" src="/images/logo.png" mode="aspectFit"></image>
+      <text class="title">自动排座位系统</text>
+      <text class="subtitle">智能座位安排，让学习更高效</text>
+    </view>
+
+    <!-- 功能介绍 -->
+    <view class="features">
+      <view class="feature-item">
+        <view class="feature-icon">🎯</view>
+        <view class="feature-text">
+          <text class="feature-title">个性化偏好</text>
+          <text class="feature-desc">根据您的意愿安排最合适的座位</text>
+        </view>
+      </view>
+      
+      <view class="feature-item">
+        <view class="feature-icon">👥</view>
+        <view class="feature-text">
+          <text class="feature-title">邻座匹配</text>
+          <text class="feature-desc">与学习伙伴坐在一起互相促进</text>
+        </view>
+      </view>
+      
+      <view class="feature-item">
+        <view class="feature-icon">⚡</view>
+        <view class="feature-text">
+          <text class="feature-title">智能算法</text>
+          <text class="feature-desc">AI算法平衡所有需求找到最优解</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 登录按钮 -->
+    <view class="login-section">
+      <button 
+        class="login-btn {{loading ? 'loading' : ''}}" 
+        bindtap="onWxLogin"
+        disabled="{{loading}}"
+      >
+        <text wx:if="{{!loading}}">微信授权登录</text>
+        <text wx:else>登录中...</text>
+      </button>
+      
+      <view class="login-tips">
+        <text>登录即表示同意</text>
+        <text class="link">《用户协议》</text>
+        <text>和</text>
+        <text class="link">《隐私政策》</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 已登录状态 -->
+  <view wx:else class="profile-container">
+    <view class="user-card">
+      <image class="avatar" src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+      
+      <view class="user-info">
+        <text class="username">{{userInfo.name || userInfo.nickName}}</text>
+        <text class="user-desc">{{userInfo.class_name || '未绑定班级'}}</text>
+        <text class="user-id">学号: {{userInfo.student_number || '未设置'}}</text>
+      </view>
+    </view>
+
+    <view class="action-buttons">
+      <button class="primary-btn" bindtap="navigateToMain">进入系统</button>
+      <button class="secondary-btn" bindtap="onLogout">退出登录</button>
+    </view>
+  </view>
+</view>

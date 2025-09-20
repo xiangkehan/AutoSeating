@@ -1,16 +1,58 @@
 {
   "pages": [
+    "pages/login/login",
+    "pages/profile/profile",
+    "pages/seat-selection/seat-selection",
+    "pages/neighbor-preference/neighbor-preference",
+    "pages/wish-submit/wish-submit",
+    "pages/result/result",
     "pages/index/index",
     "pages/example/index"
   ],
   "window": {
     "backgroundColor": "#F6F6F6",
     "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#F6F6F6",
-    "navigationBarTitleText": "云开发 QuickStart",
-    "navigationBarTextStyle": "black"
+    "navigationBarBackgroundColor": "#1976D2",
+    "navigationBarTitleText": "自动排座位系统",
+    "navigationBarTextStyle": "white"
+  },
+  "tabBar": {
+    "color": "#7A7E83",
+    "selectedColor": "#1976D2",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/seat-selection/seat-selection",
+        "iconPath": "images/seat_normal.png",
+        "selectedIconPath": "images/seat_selected.png",
+        "text": "选择座位"
+      },
+      {
+        "pagePath": "pages/wish-submit/wish-submit",
+        "iconPath": "images/wish_normal.png",
+        "selectedIconPath": "images/wish_selected.png",
+        "text": "我的意愿"
+      },
+      {
+        "pagePath": "pages/result/result",
+        "iconPath": "images/result_normal.png",
+        "selectedIconPath": "images/result_selected.png",
+        "text": "排座结果"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "iconPath": "images/profile_normal.png",
+        "selectedIconPath": "images/profile_selected.png",
+        "text": "个人中心"
+      }
+    ]
   },
   "sitemapLocation": "sitemap.json",
   "style": "v2",
-  "lazyCodeLoading": "requiredComponents"
+  "lazyCodeLoading": "requiredComponents",
+  "permission": {
+    "scope.userInfo": {
+      "desc": "用于完善用户资料"
+    }
+  }
 }

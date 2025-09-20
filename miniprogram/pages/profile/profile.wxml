@@ -1,0 +1,187 @@
+<!--pages/profile/profile.wxml-->
+<view class="container">
+  <loading wx:if="{{loading}}">加载中...</loading>
+  
+  <!-- 查看模式 -->
+  <view wx:if="{{action === 'view'}}" class="profile-view">
+    <view class="user-header">
+      <image class="avatar" src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+      <view class="user-basic">
+        <text class="username">{{userInfo.name || '未设置'}}</text>
+        <text class="user-role">学生</text>
+      </view>
+      <button class="edit-btn" bindtap="onEdit">编辑</button>
+    </view>
+
+    <view class="info-card">
+      <view class="card-header">
+        <text class="card-title">基本信息</text>
+      </view>
+      
+      <view class="info-item">
+        <text class="label">姓名</text>
+        <text class="value">{{userInfo.name || '未设置'}}</text>
+      </view>
+      
+      <view class="info-item">
+        <text class="label">学号</text>
+        <text class="value">{{userInfo.student_number || '未设置'}}</text>
+      </view>
+      
+      <view class="info-item">
+        <text class="label">班级</text>
+        <text class="value">{{userInfo.class_name || '未设置'}}</text>
+      </view>
+    </view>
+
+    <view class="info-card">
+      <view class="card-header">
+        <text class="card-title">特殊需求</text>
+      </view>
+      
+      <view class="special-needs">
+        <view class="need-item {{userInfo.special_needs.vision_impaired ? 'active' : ''}}">
+          <text class="need-label">视力障碍</text>
+          <text class="need-status">{{userInfo.special_needs.vision_impaired ? '是' : '否'}}</text>
+        </view>
+        
+        <view class="need-item {{userInfo.special_needs.hearing_impaired ? 'active' : ''}}">
+          <text class="need-label">听力障碍</text>
+          <text class="need-status">{{userInfo.special_needs.hearing_impaired ? '是' : '否'}}</text>
+        </view>
+        
+        <view class="need-item {{userInfo.special_needs.height_tall ? 'active' : ''}}">
+          <text class="need-label">身高较高</text>
+          <text class="need-status">{{userInfo.special_needs.height_tall ? '是' : '否'}}</text>
+        </view>
+        
+        <view wx:if="{{userInfo.special_needs.other_requirements}}" class="other-requirements">
+          <text class="need-label">其他需求</text>
+          <text class="need-content">{{userInfo.special_needs.other_requirements}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="action-section">
+      <button class="logout-btn" bindtap="onLogout">退出登录</button>
+    </view>
+  </view>
+
+  <!-- 编辑/设置模式 -->
+  <view wx:else class="profile-form">
+    <view class="form-header">
+      <text class="form-title">{{action === 'setup' ? '完善个人信息' : '编辑个人信息'}}</text>
+      <text class="form-subtitle">请填写真实信息，用于座位安排</text>
+    </view>
+
+    <view class="form-card">
+      <view class="form-group">
+        <label class="form-label">姓名 <text class="required">*</text></label>
+        <input 
+          class="form-input" 
+          type="text" 
+          placeholder="请输入真实姓名"
+          value="{{formData.name}}"
+          bindinput="onNameInput"
+          maxlength="20"
+        />
+      </view>
+
+      <view class="form-group">
+        <label class="form-label">学号 <text class="required">*</text></label>
+        <input 
+          class="form-input" 
+          type="number" 
+          placeholder="请输入学号"
+          value="{{formData.student_number}}"
+          bindinput="onStudentNumberInput"
+          maxlength="12"
+        />
+      </view>
+
+      <view class="form-group">
+        <label class="form-label">班级 <text class="required">*</text></label>
+        <picker 
+          class="form-picker"
+          mode="selector"
+          range="{{classList}}"
+          range-key="name"
+          bindchange="onClassChange"
+        >
+          <view class="picker-content {{formData.class_id ? '' : 'placeholder'}}">
+            {{formData.class_id ? (classList.find(item => item.class_id === formData.class_id) || {}).name : '请选择班级'}}
+          </view>
+        </picker>
+      </view>
+    </view>
+
+    <view class="form-card">
+      <view class="card-header">
+        <text class="card-title">特殊需求</text>
+        <text class="card-subtitle">勾选适用的选项，帮助我们更好地安排座位</text>
+      </view>
+
+      <view class="switch-group">
+        <view class="switch-item">
+          <text class="switch-label">视力障碍</text>
+          <switch 
+            data-field="vision_impaired"
+            checked="{{formData.special_needs.vision_impaired}}"
+            bindchange="onSpecialNeedChange"
+            color="#1976D2"
+          />
+        </view>
+
+        <view class="switch-item">
+          <text class="switch-label">听力障碍</text>
+          <switch 
+            data-field="hearing_impaired"
+            checked="{{formData.special_needs.hearing_impaired}}"
+            bindchange="onSpecialNeedChange"
+            color="#1976D2"
+          />
+        </view>
+
+        <view class="switch-item">
+          <text class="switch-label">身高较高</text>
+          <switch 
+            data-field="height_tall"
+            checked="{{formData.special_needs.height_tall}}"
+            bindchange="onSpecialNeedChange"
+            color="#1976D2"
+          />
+        </view>
+      </view>
+
+      <view class="form-group">
+        <label class="form-label">其他需求</label>
+        <textarea 
+          class="form-textarea"
+          placeholder="请描述其他特殊需求或偏好"
+          value="{{formData.special_needs.other_requirements}}"
+          bindinput="onOtherRequirementsInput"
+          maxlength="200"
+          show-confirm-bar="{{false}}"
+        />
+        <text class="char-count">{{formData.special_needs.other_requirements.length}}/200</text>
+      </view>
+    </view>
+
+    <view class="form-actions">
+      <button 
+        wx:if="{{action === 'edit'}}"
+        class="cancel-btn" 
+        bindtap="onCancel"
+      >取消</button>
+      
+      <button 
+        class="submit-btn {{submitting ? 'loading' : ''}}" 
+        bindtap="onSubmit"
+        disabled="{{submitting}}"
+      >
+        <text wx:if="{{!submitting}}">{{action === 'setup' ? '完成设置' : '保存'}}</text>
+        <text wx:else>保存中...</text>
+      </button>
+    </view>
+  </view>
+</view>
