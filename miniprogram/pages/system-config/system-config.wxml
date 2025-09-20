@@ -1,0 +1,215 @@
+<!--pages/system-config/system-config.wxml-->
+<view class=\"config-container\">
+  <!-- 页面标题 -->
+  <view class=\"page-header\">
+    <text class=\"page-title\">系统配置</text>
+    <view class=\"header-actions\">
+      <button class=\"action-btn\" bind:tap=\"exportConfig\">
+        <text class=\"icon\">📤</text>
+        导出
+      </button>
+      <button class=\"action-btn danger\" bind:tap=\"initConfig\">
+        <text class=\"icon\">🔄</text>
+        重置
+      </button>
+    </view>
+  </view>
+
+  <!-- 分类选项卡 -->
+  <view class=\"category-tabs\">
+    <view 
+      class=\"tab-item {{activeCategory === item.key ? 'active' : ''}}\"
+      wx:for=\"{{configCategories}}\"
+      wx:key=\"key\"
+      data-category=\"{{item.key}}\"
+      bind:tap=\"switchCategory\"
+    >
+      <text class=\"tab-icon\">{{item.icon}}</text>
+      <text class=\"tab-name\">{{item.name}}</text>
+    </view>
+  </view>
+
+  <!-- 配置列表 -->
+  <view class=\"config-list\" wx:if=\"{{!loading}}\">
+    <view 
+      class=\"config-item\"
+      wx:for=\"{{configs[activeCategory]}}\"
+      wx:key=\"config_id\"
+    >
+      <view class=\"config-header\">
+        <view class=\"config-info\">
+          <text class=\"config-name\">{{item.name}}</text>
+          <text class=\"config-key\">{{item.key}}</text>
+        </view>
+        <view class=\"config-actions\">
+          <button 
+            class=\"action-btn small\"
+            data-config=\"{{item}}\"
+            bind:tap=\"viewHistory\"
+          >
+            <text class=\"icon\">📜</text>
+          </button>
+          <button 
+            class=\"action-btn small primary\"
+            data-config=\"{{item}}\"
+            bind:tap=\"editConfig\"
+          >
+            <text class=\"icon\">✏️</text>
+          </button>
+        </view>
+      </view>
+      
+      <view class=\"config-content\">
+        <view class=\"config-description\">
+          <text>{{item.description}}</text>
+        </view>
+        
+        <view class=\"config-value\">
+          <text class=\"value-label\">当前值：</text>
+          <text class=\"value-text {{item.value_type}}\">{{formatValue(item.value, item.value_type)}}</text>
+        </view>
+        
+        <view class=\"config-type\">
+          <text class=\"type-label\">类型：</text>
+          <text class=\"type-text\">{{item.value_type}}</text>
+        </view>
+        
+        <view class=\"config-validation\" wx:if=\"{{item.validation_rules}}\">
+          <text class=\"validation-label\">验证规则：</text>
+          <text class=\"validation-text\">{{JSON.stringify(item.validation_rules)}}</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 空状态 -->
+    <view class=\"empty-state\" wx:if=\"{{!configs[activeCategory] || configs[activeCategory].length === 0}}\">
+      <text class=\"empty-icon\">⚙️</text>
+      <text class=\"empty-text\">该分类下暂无配置项</text>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class=\"loading-state\" wx:if=\"{{loading}}\">
+    <text class=\"loading-text\">加载中...</text>
+  </view>
+</view>
+
+<!-- 编辑配置弹窗 -->
+<view class=\"modal-overlay\" wx:if=\"{{showEditModal}}\" catch:tap=\"cancelEdit\">
+  <view class=\"modal-content\" catch:tap=\"\">
+    <view class=\"modal-header\">
+      <text class=\"modal-title\">编辑配置</text>
+      <button class=\"close-btn\" bind:tap=\"cancelEdit\">×</button>
+    </view>
+    
+    <view class=\"modal-body\" wx:if=\"{{editingConfig}}\">
+      <view class=\"edit-info\">
+        <text class=\"edit-name\">{{editingConfig.name}}</text>
+        <text class=\"edit-description\">{{editingConfig.description}}</text>
+      </view>
+      
+      <view class=\"edit-form\">
+        <view class=\"form-item\">
+          <text class=\"form-label\">值类型：{{editingConfig.value_type}}</text>
+        </view>
+        
+        <view class=\"form-item\">
+          <text class=\"form-label\">新值：</text>
+          <textarea 
+            class=\"form-input {{editingConfig.value_type}}\"
+            value=\"{{editValue}}\"
+            placeholder=\"请输入新的配置值\"
+            bind:input=\"onEditValueChange\"
+            auto-height=\"{{editingConfig.value_type === 'json' || editingConfig.value_type === 'array'}}\"
+          ></textarea>
+        </view>
+        
+        <view class=\"form-item\" wx:if=\"{{editingConfig.validation_rules}}\">
+          <text class=\"form-label\">验证规则：</text>
+          <text class=\"validation-info\">{{JSON.stringify(editingConfig.validation_rules)}}</text>
+        </view>
+      </view>
+    </view>
+    
+    <view class=\"modal-footer\">
+      <button class=\"modal-btn secondary\" bind:tap=\"cancelEdit\">取消</button>
+      <button 
+        class=\"modal-btn primary {{saveLoading ? 'loading' : ''}}\"
+        bind:tap=\"saveConfig\"
+        disabled=\"{{saveLoading}}\"
+      >
+        {{saveLoading ? '保存中...' : '保存'}}
+      </button>
+    </view>
+  </view>
+</view>
+
+<!-- 历史记录弹窗 -->
+<view class=\"modal-overlay\" wx:if=\"{{showHistory}}\" catch:tap=\"closeHistory\">
+  <view class=\"modal-content large\" catch:tap=\"\">
+    <view class=\"modal-header\">
+      <text class=\"modal-title\">配置历史</text>
+      <button class=\"close-btn\" bind:tap=\"closeHistory\">×</button>
+    </view>
+    
+    <view class=\"modal-body\">
+      <view class=\"history-list\" wx:if=\"{{!historyLoading}}\">
+        <view 
+          class=\"history-item\"
+          wx:for=\"{{configHistory}}\"
+          wx:key=\"_id\"
+        >
+          <view class=\"history-header\">
+            <text class=\"history-time\">{{formatDate(item.timestamp)}}</text>
+            <text class=\"history-user\">{{item.changed_by_name}}</text>
+          </view>
+          
+          <view class=\"history-content\">
+            <view class=\"value-change\">
+              <text class=\"change-label\">旧值：</text>
+              <text class=\"change-value old\">{{item.old_value}}</text>
+            </view>
+            <view class=\"value-change\">
+              <text class=\"change-label\">新值：</text>
+              <text class=\"change-value new\">{{item.new_value}}</text>
+            </view>
+          </view>
+        </view>
+        
+        <view class=\"empty-history\" wx:if=\"{{configHistory.length === 0}}\">
+          <text class=\"empty-text\">暂无历史记录</text>
+        </view>
+      </view>
+      
+      <view class=\"loading-state\" wx:if=\"{{historyLoading}}\">
+        <text class=\"loading-text\">加载中...</text>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 导入导出弹窗 -->
+<view class=\"modal-overlay\" wx:if=\"{{showImportExport}}\" catch:tap=\"closeImportExport\">
+  <view class=\"modal-content large\" catch:tap=\"\">
+    <view class=\"modal-header\">
+      <text class=\"modal-title\">导出配置</text>
+      <button class=\"close-btn\" bind:tap=\"closeImportExport\">×</button>
+    </view>
+    
+    <view class=\"modal-body\">
+      <view class=\"export-content\">
+        <textarea 
+          class=\"export-data\"
+          value=\"{{exportData}}\"
+          readonly
+          auto-height
+        ></textarea>
+      </view>
+    </view>
+    
+    <view class=\"modal-footer\">
+      <button class=\"modal-btn secondary\" bind:tap=\"closeImportExport\">关闭</button>
+      <button class=\"modal-btn primary\" bind:tap=\"copyExportData\">复制</button>
+    </view>
+  </view>
+</view>", "file_path": "c:\\Users\\xjh20\\WeChatProjects\\miniprogram-2\\miniprogram\\pages\\system-config\\system-config.wxml"}]

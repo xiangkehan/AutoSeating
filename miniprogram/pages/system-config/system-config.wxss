@@ -1,0 +1,487 @@
+/* pages/system-config/system-config.wxss */
+.config-container {
+  padding: 20rpx;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+/* 页面标题 */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx 40rpx;
+  background-color: #fff;
+  border-radius: 20rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+}
+
+.page-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.header-actions {
+  display: flex;
+  gap: 20rpx;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  padding: 16rpx 24rpx;
+  background-color: #007aff;
+  color: white;
+  border-radius: 20rpx;
+  border: none;
+  font-size: 28rpx;
+}
+
+.action-btn.danger {
+  background-color: #ff3b30;
+}
+
+.action-btn.small {
+  padding: 12rpx 20rpx;
+  font-size: 24rpx;
+}
+
+.action-btn.primary {
+  background-color: #007aff;
+}
+
+.action-btn .icon {
+  font-size: 24rpx;
+}
+
+/* 分类选项卡 */
+.category-tabs {
+  display: flex;
+  background-color: #fff;
+  border-radius: 20rpx;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+}
+
+.tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20rpx 30rpx;
+  border-radius: 16rpx;
+  margin-right: 20rpx;
+  min-width: 120rpx;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.tab-item.active {
+  background-color: #007aff;
+  color: white;
+}
+
+.tab-icon {
+  font-size: 32rpx;
+  margin-bottom: 8rpx;
+}
+
+.tab-name {
+  font-size: 24rpx;
+}
+
+/* 配置列表 */
+.config-list {
+  background-color: #fff;
+  border-radius: 20rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+}
+
+.config-item {
+  padding: 40rpx;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.config-item:last-child {
+  border-bottom: none;
+}
+
+.config-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20rpx;
+}
+
+.config-info {
+  flex: 1;
+}
+
+.config-name {
+  display: block;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.config-key {
+  display: block;
+  font-size: 24rpx;
+  color: #666;
+  font-family: 'Courier New', monospace;
+  background-color: #f8f9fa;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  display: inline-block;
+}
+
+.config-actions {
+  display: flex;
+  gap: 12rpx;
+}
+
+.config-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.config-description {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.5;
+}
+
+.config-value,
+.config-type,
+.config-validation {
+  display: flex;
+  align-items: flex-start;
+}
+
+.value-label,
+.type-label,
+.validation-label {
+  font-size: 26rpx;
+  color: #999;
+  width: 120rpx;
+  flex-shrink: 0;
+}
+
+.value-text {
+  font-size: 26rpx;
+  color: #333;
+  font-family: 'Courier New', monospace;
+  flex: 1;
+  word-break: break-all;
+  padding: 8rpx 16rpx;
+  background-color: #f8f9fa;
+  border-radius: 8rpx;
+  border: 1px solid #e9ecef;
+}
+
+.value-text.boolean {
+  color: #007aff;
+  font-weight: bold;
+}
+
+.value-text.number {
+  color: #ff6b35;
+  font-weight: bold;
+}
+
+.type-text {
+  font-size: 24rpx;
+  color: #666;
+  background-color: #e9ecef;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  font-family: 'Courier New', monospace;
+}
+
+.validation-text {
+  font-size: 24rpx;
+  color: #666;
+  font-family: 'Courier New', monospace;
+  word-break: break-all;
+}
+
+/* 加载和空状态 */
+.loading-state,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 120rpx 40rpx;
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.empty-icon {
+  font-size: 120rpx;
+  margin-bottom: 30rpx;
+  opacity: 0.5;
+}
+
+.empty-text {
+  font-size: 32rpx;
+  color: #999;
+}
+
+/* 弹窗样式 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #fff;
+  border-radius: 20rpx;
+  width: 90vw;
+  max-width: 600rpx;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-content.large {
+  width: 95vw;
+  max-width: 800rpx;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 40rpx;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.modal-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.close-btn {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  background-color: #f0f0f0;
+  border: none;
+  font-size: 32rpx;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-body {
+  flex: 1;
+  padding: 40rpx;
+  overflow-y: auto;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 20rpx;
+  padding: 40rpx;
+  border-top: 1px solid #f0f0f0;
+}
+
+.modal-btn {
+  padding: 20rpx 40rpx;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  border: none;
+}
+
+.modal-btn.primary {
+  background-color: #007aff;
+  color: white;
+}
+
+.modal-btn.secondary {
+  background-color: #f8f9fa;
+  color: #666;
+  border: 1px solid #e9ecef;
+}
+
+.modal-btn.loading {
+  opacity: 0.7;
+}
+
+/* 编辑表单 */
+.edit-info {
+  margin-bottom: 30rpx;
+}
+
+.edit-name {
+  display: block;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.edit-description {
+  display: block;
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.5;
+}
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 30rpx;
+}
+
+.form-item {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.form-label {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.form-input {
+  padding: 20rpx;
+  border: 1px solid #e9ecef;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  background-color: #fff;
+  min-height: 80rpx;
+}
+
+.form-input.json,
+.form-input.array {
+  font-family: 'Courier New', monospace;
+  min-height: 200rpx;
+}
+
+.validation-info {
+  font-size: 24rpx;
+  color: #666;
+  font-family: 'Courier New', monospace;
+  background-color: #f8f9fa;
+  padding: 16rpx;
+  border-radius: 8rpx;
+  word-break: break-all;
+}
+
+/* 历史记录 */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 30rpx;
+}
+
+.history-item {
+  padding: 30rpx;
+  background-color: #f8f9fa;
+  border-radius: 16rpx;
+  border: 1px solid #e9ecef;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.history-time {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.history-user {
+  font-size: 24rpx;
+  color: #007aff;
+  background-color: #e3f2fd;
+  padding: 4rpx 12rpx;
+  border-radius: 20rpx;
+}
+
+.history-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.value-change {
+  display: flex;
+  align-items: flex-start;
+}
+
+.change-label {
+  font-size: 24rpx;
+  color: #666;
+  width: 80rpx;
+  flex-shrink: 0;
+}
+
+.change-value {
+  font-size: 24rpx;
+  font-family: 'Courier New', monospace;
+  flex: 1;
+  word-break: break-all;
+  padding: 8rpx 12rpx;
+  border-radius: 8rpx;
+}
+
+.change-value.old {
+  background-color: #ffebee;
+  color: #d32f2f;
+}
+
+.change-value.new {
+  background-color: #e8f5e8;
+  color: #388e3c;
+}
+
+.empty-history {
+  text-align: center;
+  padding: 60rpx;
+}
+
+/* 导出数据 */
+.export-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.export-data {
+  font-family: 'Courier New', monospace;
+  font-size: 24rpx;
+  padding: 20rpx;
+  border: 1px solid #e9ecef;
+  border-radius: 12rpx;
+  background-color: #f8f9fa;
+  min-height: 400rpx;
+  color: #333;
+}", "file_path": "c:\\Users\\xjh20\\WeChatProjects\\miniprogram-2\\miniprogram\\pages\\system-config\\system-config.wxss"}]

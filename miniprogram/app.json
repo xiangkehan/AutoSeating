@@ -9,6 +9,8 @@
     "pages/admin-login/admin-login",
     "pages/admin-dashboard/admin-dashboard",
     "pages/admin-wish/admin-wish",
+    "pages/audit-logs/audit-logs",
+    "pages/system-config/system-config",
     "pages/index/index",
     "pages/example/index"
   ],

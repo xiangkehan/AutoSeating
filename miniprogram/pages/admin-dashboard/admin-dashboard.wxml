@@ -92,6 +92,16 @@
           <text class="module-name">执行排座</text>
           <text class="module-desc">运行排座算法</text>
         </view>
+        <view class="module-item" bindtap="navigateTo" data-page="audit-logs">
+          <view class="module-icon">📜</view>
+          <text class="module-name">审计日志</text>
+          <text class="module-desc">查看操作记录</text>
+        </view>
+        <view class="module-item" bindtap="navigateTo" data-page="system-config">
+          <view class="module-icon">⚙️</view>
+          <text class="module-name">系统配置</text>
+          <text class="module-desc">管理系统参数</text>
+        </view>
       </view>
     </view>
   </view>
