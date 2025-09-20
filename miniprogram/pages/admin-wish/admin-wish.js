@@ -1,4 +1,6 @@
 // 管理员意愿填写页面逻辑
+const { createButtonStateManager } = require('../../utils/buttonStateManager');
+
 Page({
   data: {
     adminInfo: {},
@@ -11,7 +13,7 @@ Page({
     colleagueList: [],
     avoidColleagueList: [],
     specialRequirements: '',
-    isSubmitting: false
+    buttonStates: {}
   },
 
   onLoad() {
@@ -19,9 +21,41 @@ Page({
       title: '管理员意愿填写'
     });
     
+    // 初始化按钮状态管理器
+    this.buttonManager = createButtonStateManager(this);
+    
+    // 初始化按钮状态
+    this.buttonManager.initButton('submitBtn', {
+      text: '提交意愿',
+      type: 'primary',
+      loadingText: '提交中...',
+      successText: '提交成功'
+    });
+    
+    this.buttonManager.initButton('loadClassBtn', {
+      text: '加载班级',
+      type: 'secondary',
+      loadingText: '加载中...',
+      successText: '加载成功'
+    });
+    
+    this.buttonManager.initButton('loadColleagueBtn', {
+      text: '加载同事',
+      type: 'secondary', 
+      loadingText: '加载中...',
+      successText: '加载成功'
+    });
+    
     this.loadAdminInfo();
     this.loadClassList();
     this.loadColleagueList();
+  },
+  
+  onUnload() {
+    // 页面销毁时清理资源
+    if (this.buttonManager) {
+      this.buttonManager.cleanup();
+    }
   },
 
   // 加载管理员信息
@@ -38,7 +72,7 @@ Page({
 
   // 加载班级列表
   async loadClassList() {
-    try {
+    await this.buttonManager.executeAsync('loadClassBtn', async () => {
       const token = wx.getStorageSync('adminToken');
       const result = await wx.cloud.callFunction({
         name: 'seatArrangementFunctions',
@@ -52,15 +86,19 @@ Page({
         this.setData({
           classList: result.result.data
         });
+        return result;
+      } else {
+        throw new Error('加载班级列表失败');
       }
-    } catch (error) {
-      console.error('加载班级列表失败:', error);
-    }
+    }, {
+      successText: '',
+      hideSuccess: true
+    });
   },
 
   // 加载同事列表
   async loadColleagueList() {
-    try {
+    await this.buttonManager.executeAsync('loadColleagueBtn', async () => {
       const token = wx.getStorageSync('adminToken');
       const result = await wx.cloud.callFunction({
         name: 'seatArrangementFunctions',
@@ -80,10 +118,14 @@ Page({
           colleagueList: colleagues,
           avoidColleagueList: colleagues.map(c => ({...c}))
         });
+        return result;
+      } else {
+        throw new Error('加载同事列表失败');
       }
-    } catch (error) {
-      console.error('加载同事列表失败:', error);
-    }
+    }, {
+      successText: '',
+      hideSuccess: true
+    });
   },
 
   // 班级选择
@@ -245,9 +287,7 @@ Page({
       return;
     }
 
-    this.setData({ isSubmitting: true });
-
-    try {
+    await this.buttonManager.executeAsync('submitBtn', async () => {
       const token = wx.getStorageSync('adminToken');
       const preferredColleagues = colleagueList.filter(c => c.selected).map(c => c.id);
       const avoidColleagues = avoidColleagueList.filter(c => c.selected).map(c => c.id);
@@ -269,28 +309,17 @@ Page({
       });
 
       if (result.result.success) {
-        wx.showToast({
-          title: '意愿提交成功',
-          icon: 'success'
-        });
-
         setTimeout(() => {
           wx.navigateBack();
         }, 1500);
+        return result;
       } else {
-        wx.showToast({
-          title: result.result.message || '提交失败',
-          icon: 'none'
-        });
+        throw new Error(result.result.message || '提交失败');
       }
-    } catch (error) {
-      console.error('提交意愿失败:', error);
-      wx.showToast({
-        title: '提交失败，请重试',
-        icon: 'none'
-      });
-    } finally {
-      this.setData({ isSubmitting: false });
-    }
+    }, {
+      successText: '意愿提交成功',
+      useErrorModal: true,
+      errorTitle: '提交失败'
+    });
   }
 });

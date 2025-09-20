@@ -74,10 +74,29 @@
   font-size: 30rpx;
   font-weight: 500;
   margin-top: 20rpx;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-btn:active {
+  background: #1565C0;
+  transform: scale(0.98);
 }
 
 .login-btn.loading {
   background: #ccc;
+  color: #999;
+}
+
+.login-btn.success {
+  background: #4CAF50;
+  color: #fff;
+}
+
+.login-btn:disabled {
+  opacity: 0.6;
+  transform: none;
 }
 
 .login-tips {
@@ -119,16 +138,31 @@
   font-size: 26rpx;
   padding: 20rpx 30rpx;
   margin-bottom: 16rpx;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .init-btn:active {
   background: rgba(255, 255, 255, 0.3);
+  transform: scale(0.98);
 }
 
 .init-btn.loading {
   background: rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.6);
   border-color: rgba(255, 255, 255, 0.3);
+}
+
+.init-btn.success {
+  background: rgba(76, 175, 80, 0.8);
+  border-color: #4CAF50;
+  color: #ffffff;
+}
+
+.init-btn:disabled {
+  opacity: 0.6;
+  transform: none;
 }
 
 .init-tip {

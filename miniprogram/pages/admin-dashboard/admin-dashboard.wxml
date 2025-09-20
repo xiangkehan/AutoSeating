@@ -6,8 +6,21 @@
       <text class="title">欢迎，{{adminInfo.name}}</text>
       <text class="role">{{getRoleText(adminInfo.role)}}</text>
     </view>
-    <view class="logout" bindtap="onLogout">
-      <text>退出登录</text>
+    <view class="header-actions">
+      <view 
+        class="action-btn refresh-btn {{buttonStates.refreshBtn.loading ? 'loading' : ''}}" 
+        bindtap="refreshData"
+      >
+        <text class="icon">🔄</text>
+        <text class="text">{{buttonStates.refreshBtn.text || '刷新'}}</text>
+      </view>
+      <view 
+        class="action-btn logout-btn {{buttonStates.logoutBtn.loading ? 'loading' : ''}}" 
+        bindtap="onLogout"
+      >
+        <text class="icon">🚆</text>
+        <text class="text">{{buttonStates.logoutBtn.text || '退出'}}</text>
+      </view>
     </view>
   </view>
 

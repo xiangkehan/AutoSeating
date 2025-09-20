@@ -29,11 +29,11 @@
     </view>
     
     <button 
-      class="login-btn {{isLoading ? 'loading' : ''}}" 
+      class="login-btn {{buttonStates.loginBtn.loading ? 'loading' : ''}} {{buttonStates.loginBtn.type === 'success' ? 'success' : ''}}" 
       bindtap="onLogin"
-      disabled="{{isLoading}}"
+      disabled="{{buttonStates.loginBtn.disabled}}"
     >
-      {{isLoading ? '登录中...' : '登录'}}
+      {{buttonStates.loginBtn.text || '登录'}}
     </button>
   </view>
   
@@ -45,11 +45,11 @@
   
   <view class="init-section">
     <button 
-      class="init-btn {{isInitializing ? 'loading' : ''}}" 
+      class="init-btn {{buttonStates.initBtn.loading ? 'loading' : ''}} {{buttonStates.initBtn.type === 'success' ? 'success' : ''}}" 
       bindtap="initDatabase"
-      disabled="{{isInitializing}}"
+      disabled="{{buttonStates.initBtn.disabled}}"
     >
-      {{isInitializing ? '初始化中...' : '初始化数据库'}}
+      {{buttonStates.initBtn.text || '初始化数据库'}}
     </button>
     <text class="init-tip">首次使用或数据库为空时点击此按钮</text>
   </view>

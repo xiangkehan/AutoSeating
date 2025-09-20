@@ -1,4 +1,6 @@
 // 管理员仪表盘页面逻辑
+const { createButtonStateManager } = require('../../utils/buttonStateManager');
+
 Page({
   data: {
     adminInfo: {},
@@ -8,12 +10,38 @@ Page({
       completedArrangements: 0,
       totalWishes: 0
     },
-    recentActivities: []
+    recentActivities: [],
+    buttonStates: {}
   },
 
   onLoad() {
     wx.setNavigationBarTitle({
       title: '管理员仪表盘'
+    });
+    
+    // 初始化按钮状态管理器
+    this.buttonManager = createButtonStateManager(this);
+    
+    // 初始化按钮状态
+    this.buttonManager.initButton('logoutBtn', {
+      text: '退出登录',
+      type: 'secondary',
+      loadingText: '退出中...',
+      successText: '已退出'
+    });
+    
+    this.buttonManager.initButton('refreshBtn', {
+      text: '刷新数据',
+      type: 'primary',
+      loadingText: '刷新中...',
+      successText: '刷新成功'
+    });
+    
+    this.buttonManager.initButton('initDbBtn', {
+      text: '初始化数据库',
+      type: 'warning',
+      loadingText: '初始化中...',
+      successText: '初始化成功'
     });
     
     this.loadAdminInfo();
@@ -22,7 +50,14 @@ Page({
 
   onShow() {
     // 页面显示时刷新数据
-    this.loadDashboardData();
+    this.refreshData();
+  },
+  
+  onUnload() {
+    // 页面销毁时清理资源
+    if (this.buttonManager) {
+      this.buttonManager.cleanup();
+    }
   },
 
   // 加载管理员信息
@@ -36,6 +71,17 @@ Page({
         url: '/pages/admin-login/admin-login'
       });
     }
+  },
+
+  // 刷新数据
+  async refreshData() {
+    await this.buttonManager.executeAsync('refreshBtn', async () => {
+      await this.loadDashboardData();
+      return { success: true };
+    }, {
+      successText: '数据已更新',
+      clickInterval: 2000 // 2秒内防止重复点击
+    });
   },
 
   // 加载仪表盘数据
@@ -70,59 +116,49 @@ Page({
       console.error('加载仪表盘数据失败:', error);
       // 如果是数据库错误，可能是首次初始化
       if (error.errCode === -502005) {
-        wx.showModal({
-          title: '提示',
-          content: '检测到系统首次初始化，是否现在初始化数据库？',
-          confirmText: '初始化',
-          cancelText: '取消',
-          success: (res) => {
-            if (res.confirm) {
-              this.initDatabase();
-            }
-          }
-        });
+        this.showInitDBPrompt();
       }
     }
   },
 
   // 初始化数据库
   async initDatabase() {
-    wx.showLoading({
-      title: '初始化中...'
-    });
-    
-    try {
+    await this.buttonManager.executeAsync('initDbBtn', async () => {
       const result = await wx.cloud.callFunction({
         name: 'initDatabase',
         data: {}
       });
       
-      wx.hideLoading();
-      
       if (result.result && result.result.success) {
-        wx.showToast({
-          title: '初始化成功',
-          icon: 'success'
-        });
-        
         // 重新加载数据
         setTimeout(() => {
           this.loadDashboardData();
         }, 1000);
+        
+        return result;
       } else {
-        wx.showToast({
-          title: '初始化失败',
-          icon: 'none'
-        });
+        throw new Error('初始化失败');
       }
-    } catch (error) {
-      wx.hideLoading();
-      console.error('初始化数据库失败:', error);
-      wx.showToast({
-        title: '初始化失败',
-        icon: 'none'
-      });
-    }
+    }, {
+      successText: '初始化成功',
+      useErrorModal: true,
+      errorTitle: '初始化失败'
+    });
+  },
+  
+  // 显示初始化数据库提示
+  showInitDBPrompt() {
+    wx.showModal({
+      title: '提示',
+      content: '检测到系统首次初始化，是否现在初始化数据库？',
+      confirmText: '初始化',
+      cancelText: '取消',
+      success: (res) => {
+        if (res.confirm) {
+          this.initDatabase();
+        }
+      }
+    });
   },
 
   // 获取角色文本
@@ -148,7 +184,14 @@ Page({
 
     const url = pageMap[page];
     if (url) {
-      wx.navigateTo({ url });
+      // 添加点击动画效果
+      const target = e.currentTarget;
+      target.style.transform = 'scale(0.95)';
+      
+      setTimeout(() => {
+        target.style.transform = 'scale(1)';
+        wx.navigateTo({ url });
+      }, 150);
     } else {
       wx.showToast({
         title: '功能开发中',
@@ -164,23 +207,29 @@ Page({
       content: '确定要退出登录吗？',
       success: (res) => {
         if (res.confirm) {
-          // 清除存储的管理员信息
-          wx.removeStorageSync('adminToken');
-          wx.removeStorageSync('adminInfo');
-          
-          wx.showToast({
-            title: '已退出登录',
-            icon: 'success'
-          });
-
-          // 跳转到登录页
-          setTimeout(() => {
-            wx.redirectTo({
-              url: '/pages/admin-login/admin-login'
-            });
-          }, 1500);
+          this.executeLogout();
         }
       }
+    });
+  },
+  
+  // 执行退出登录
+  async executeLogout() {
+    await this.buttonManager.executeAsync('logoutBtn', async () => {
+      // 清除存储的管理员信息
+      wx.removeStorageSync('adminToken');
+      wx.removeStorageSync('adminInfo');
+      
+      // 跳转到登录页
+      setTimeout(() => {
+        wx.redirectTo({
+          url: '/pages/admin-login/admin-login'
+        });
+      }, 1500);
+      
+      return { success: true };
+    }, {
+      successText: '已退出登录'
     });
   }
 });

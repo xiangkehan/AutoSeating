@@ -27,11 +27,42 @@
   opacity: 0.8;
 }
 
-.logout {
-  padding: 16rpx 24rpx;
+.header-actions {
+  display: flex;
+  gap: 20rpx;
+}
+
+.action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16rpx 20rpx;
   border: 1rpx solid rgba(255, 255, 255, 0.5);
-  border-radius: 20rpx;
-  font-size: 24rpx;
+  border-radius: 12rpx;
+  font-size: 22rpx;
+  min-width: 80rpx;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.action-btn:active {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(0.95);
+}
+
+.action-btn.loading {
+  opacity: 0.6;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.action-btn .icon {
+  font-size: 28rpx;
+  margin-bottom: 4rpx;
+}
+
+.action-btn .text {
+  font-size: 20rpx;
 }
 
 /* 统计信息区域 */
@@ -117,12 +148,19 @@
   background: #f8f9fa;
   border-radius: 12rpx;
   border: 2rpx solid transparent;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .module-item:active {
   background: #e3f2fd;
   border-color: #1976D2;
+  transform: scale(0.98);
+}
+
+.module-item:hover {
+  box-shadow: 0 4rpx 12rpx rgba(25, 118, 210, 0.2);
 }
 
 .module-icon {
