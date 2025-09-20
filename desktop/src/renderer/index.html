@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自动排座位系统</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 顶部导航栏 -->
+        <header class="app-header">
+            <div class="header-left">
+                <h1 class="app-title">自动排座位系统</h1>
+                <span class="app-subtitle">离线管理端</span>
+            </div>
+            <div class="header-right">
+                <div class="sync-status" id="syncStatus">
+                    <span class="status-indicator offline" id="statusIndicator"></span>
+                    <span class="status-text" id="statusText">离线</span>
+                </div>
+                <button class="sync-btn" id="syncBtn">立即同步</button>
+            </div>
+        </header>
+
+        <!-- 主内容区域 -->
+        <main class="app-main">
+            <!-- 侧边导航 -->
+            <nav class="sidebar">
+                <ul class="nav-menu">
+                    <li class="nav-item active" data-page="dashboard">
+                        <span class="nav-icon">📊</span>
+                        <span class="nav-text">仪表盘</span>
+                    </li>
+                    <li class="nav-item" data-page="students">
+                        <span class="nav-icon">👥</span>
+                        <span class="nav-text">学生管理</span>
+                    </li>
+                    <li class="nav-item" data-page="classrooms">
+                        <span class="nav-icon">🏫</span>
+                        <span class="nav-text">教室管理</span>
+                    </li>
+                    <li class="nav-item" data-page="algorithm">
+                        <span class="nav-icon">🎯</span>
+                        <span class="nav-text">排座算法</span>
+                    </li>
+                    <li class="nav-item" data-page="results">
+                        <span class="nav-icon">📋</span>
+                        <span class="nav-text">排座结果</span>
+                    </li>
+                    <li class="nav-item" data-page="settings">
+                        <span class="nav-icon">⚙️</span>
+                        <span class="nav-text">系统设置</span>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- 内容区域 -->
+            <div class="content-area">
+                <!-- 仪表盘页面 -->
+                <div class="page active" id="dashboard-page">
+                    <div class="page-header">
+                        <h2>系统概览</h2>
+                        <p>管理和监控排座系统的运行状态</p>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="totalStudents">0</div>
+                                <div class="stat-label">学生总数</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🏫</div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="totalClassrooms">0</div>
+                                <div class="stat-label">教室数量</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🎯</div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="totalArrangements">0</div>
+                                <div class="stat-label">排座次数</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📊</div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="syncProgress">100%</div>
+                                <div class="stat-label">同步进度</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="quick-actions">
+                        <h3>快速操作</h3>
+                        <div class="action-grid">
+                            <button class="action-btn" id="importStudentsBtn">
+                                <span class="action-icon">📥</span>
+                                <span class="action-text">导入学生数据</span>
+                            </button>
+                            <button class="action-btn" id="executeAlgorithmBtn">
+                                <span class="action-icon">🎯</span>
+                                <span class="action-text">执行排座算法</span>
+                            </button>
+                            <button class="action-btn" id="exportResultsBtn">
+                                <span class="action-icon">📤</span>
+                                <span class="action-text">导出排座结果</span>
+                            </button>
+                            <button class="action-btn" id="backupDataBtn">
+                                <span class="action-icon">💾</span>
+                                <span class="action-text">备份数据</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 学生管理页面 -->
+                <div class="page" id="students-page">
+                    <div class="page-header">
+                        <h2>学生管理</h2>
+                        <div class="page-actions">
+                            <button class="btn primary" id="addStudentBtn">添加学生</button>
+                            <button class="btn secondary" id="importExcelBtn">Excel导入</button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="studentsTable">
+                            <thead>
+                                <tr>
+                                    <th>姓名</th>
+                                    <th>学号</th>
+                                    <th>班级</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentsTableBody">
+                                <!-- 学生数据将动态加载 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 教室管理页面 -->
+                <div class="page" id="classrooms-page">
+                    <div class="page-header">
+                        <h2>教室管理</h2>
+                        <div class="page-actions">
+                            <button class="btn primary" id="addClassroomBtn">添加教室</button>
+                        </div>
+                    </div>
+                    <div class="classrooms-grid" id="classroomsGrid">
+                        <!-- 教室列表将动态加载 -->
+                    </div>
+                </div>
+
+                <!-- 排座算法页面 -->
+                <div class="page" id="algorithm-page">
+                    <div class="page-header">
+                        <h2>排座算法</h2>
+                        <p>配置和执行智能排座算法</p>
+                    </div>
+                    
+                    <div class="algorithm-config">
+                        <h3>算法参数</h3>
+                        <div class="config-grid">
+                            <div class="config-item">
+                                <label>意愿权重</label>
+                                <input type="range" id="wishWeight" min="0.1" max="0.8" step="0.1" value="0.4">
+                                <span class="range-value">0.4</span>
+                            </div>
+                            <div class="config-item">
+                                <label>教学权重</label>
+                                <input type="range" id="teachingWeight" min="0.1" max="0.6" step="0.1" value="0.3">
+                                <span class="range-value">0.3</span>
+                            </div>
+                            <div class="config-item">
+                                <label>公平性权重</label>
+                                <input type="range" id="fairnessWeight" min="0.1" max="0.5" step="0.1" value="0.2">
+                                <span class="range-value">0.2</span>
+                            </div>
+                            <div class="config-item">
+                                <label>约束权重</label>
+                                <input type="range" id="constraintWeight" min="0.05" max="0.3" step="0.05" value="0.1">
+                                <span class="range-value">0.1</span>
+                            </div>
+                        </div>
+                        
+                        <div class="algorithm-actions">
+                            <button class="btn primary large" id="runAlgorithmBtn">
+                                <span class="btn-icon">🎯</span>
+                                <span class="btn-text">执行排座算法</span>
+                            </button>
+                            <div class="algorithm-status" id="algorithmStatus">
+                                <span class="status-text">准备就绪</span>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="algorithmProgress"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 排座结果页面 -->
+                <div class="page" id="results-page">
+                    <div class="page-header">
+                        <h2>排座结果</h2>
+                        <div class="page-actions">
+                            <button class="btn secondary" id="refreshResultsBtn">刷新</button>
+                            <button class="btn primary" id="exportAllResultsBtn">导出全部</button>
+                        </div>
+                    </div>
+                    <div class="results-container" id="resultsContainer">
+                        <!-- 排座结果将动态加载 -->
+                    </div>
+                </div>
+
+                <!-- 系统设置页面 -->
+                <div class="page" id="settings-page">
+                    <div class="page-header">
+                        <h2>系统设置</h2>
+                        <p>配置应用参数和同步选项</p>
+                    </div>
+                    
+                    <div class="settings-sections">
+                        <div class="settings-section">
+                            <h3>云同步设置</h3>
+                            <div class="form-group">
+                                <label>云端接口地址</label>
+                                <input type="text" id="cloudEndpoint" placeholder="https://your-cloud-function-url">
+                            </div>
+                            <div class="form-group">
+                                <label>同步间隔（秒）</label>
+                                <input type="number" id="syncInterval" min="10" max="3600" value="30">
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="autoSync" checked>
+                                    启用自动同步
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-section">
+                            <h3>算法默认参数</h3>
+                            <div class="form-group">
+                                <label>最大迭代次数</label>
+                                <input type="number" id="maxIterations" min="100" max="5000" value="1000">
+                            </div>
+                            <div class="form-group">
+                                <label>最低满意度阈值</label>
+                                <input type="number" id="minSatisfaction" min="0.5" max="0.9" step="0.1" value="0.7">
+                            </div>
+                        </div>
+                        
+                        <div class="settings-actions">
+                            <button class="btn primary" id="saveSettingsBtn">保存设置</button>
+                            <button class="btn secondary" id="resetSettingsBtn">重置默认</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 底部状态栏 -->
+        <footer class="app-footer">
+            <div class="footer-left">
+                <span class="app-version">v1.0.0</span>
+                <span class="separator">|</span>
+                <span class="last-sync" id="lastSyncTime">未同步</span>
+            </div>
+            <div class="footer-right">
+                <span class="connection-status" id="connectionStatus">离线模式</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 模态框 -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">标题</h3>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- 模态框内容 -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn secondary" id="modalCancel">取消</button>
+                <button class="btn primary" id="modalConfirm">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载脚本 -->
+    <script src="app.js"></script>
+</body>
+</html>

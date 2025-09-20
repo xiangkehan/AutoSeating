@@ -1,5 +1,6 @@
 // 管理员登录页面逻辑
 const { createButtonStateManager } = require('../../utils/buttonStateManager');
+const { adminAuth } = require('../../utils/adminAuth');
 
 Page({
   data: {
@@ -12,6 +13,14 @@ Page({
     wx.setNavigationBarTitle({
       title: '管理员登录'
     });
+    
+    // 检查是否已登录
+    if (adminAuth.isLoggedIn()) {
+      wx.redirectTo({
+        url: '/pages/admin-dashboard/admin-dashboard'
+      });
+      return;
+    }
     
     // 初始化按钮状态管理器
     this.buttonManager = createButtonStateManager(this);
@@ -79,11 +88,10 @@ Page({
       console.log('登录结果:', result);
 
       if (result.result && result.result.success) {
-        const { token, adminProfile } = result.result.data;
+        const { token, adminProfile, expiresIn } = result.result.data;
         
-        // 保存管理员信息
-        wx.setStorageSync('adminToken', token);
-        wx.setStorageSync('adminInfo', adminProfile);
+        // 使用新的认证管理器保存登录信息
+        adminAuth.saveLoginInfo(token, adminProfile, expiresIn);
         
         // 跳转到管理员仪表盘
         setTimeout(() => {

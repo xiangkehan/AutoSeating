@@ -1,5 +1,6 @@
 // 管理员仪表盘页面逻辑
 const { createButtonStateManager } = require('../../utils/buttonStateManager');
+const { adminAuth } = require('../../utils/adminAuth');
 
 Page({
   data: {
@@ -18,6 +19,24 @@ Page({
     wx.setNavigationBarTitle({
       title: '管理员仪表盘'
     });
+    
+    // 检查登录状态
+    if (adminAuth.requireLogin('admin-dashboard')) {
+      return;
+    }
+    
+    // 检查页面权限
+    if (!adminAuth.checkPagePermission('admin-dashboard')) {
+      wx.showModal({
+        title: '权限不足',
+        content: '您没有访问此页面的权限',
+        showCancel: false,
+        success: () => {
+          wx.navigateBack();
+        }
+      });
+      return;
+    }
     
     // 初始化按钮状态管理器
     this.buttonManager = createButtonStateManager(this);
@@ -62,14 +81,12 @@ Page({
 
   // 加载管理员信息
   loadAdminInfo() {
-    const adminInfo = wx.getStorageSync('adminInfo');
+    const adminInfo = adminAuth.getAdminInfo();
     if (adminInfo) {
       this.setData({ adminInfo });
     } else {
       // 未登录，跳转到登录页
-      wx.redirectTo({
-        url: '/pages/admin-login/admin-login'
-      });
+      adminAuth.requireLogin('admin-dashboard');
     }
   },
 
@@ -87,17 +104,10 @@ Page({
   // 加载仪表盘数据
   async loadDashboardData() {
     try {
-      const token = wx.getStorageSync('adminToken');
-      if (!token) {
-        console.log('未找到管理员令牌');
-        return;
-      }
-      
-      const result = await wx.cloud.callFunction({
+      const result = await adminAuth.callCloudFunction({
         name: 'seatArrangementFunctions',
         data: {
-          type: 'getDashboardStats',
-          token
+          type: 'getDashboardStats'
         }
       });
 
@@ -173,6 +183,16 @@ Page({
   // 导航到指定页面
   navigateTo(e) {
     const page = e.currentTarget.dataset.page;
+    
+    // 检查页面权限
+    if (!adminAuth.checkPagePermission(page)) {
+      wx.showToast({
+        title: '权限不足，无法访问',
+        icon: 'none'
+      });
+      return;
+    }
+    
     const pageMap = {
       'admin-wish': '/pages/admin-wish/admin-wish',
       'view-results': '/pages/admin-results/admin-results',
@@ -216,9 +236,8 @@ Page({
   // 执行退出登录
   async executeLogout() {
     await this.buttonManager.executeAsync('logoutBtn', async () => {
-      // 清除存储的管理员信息
-      wx.removeStorageSync('adminToken');
-      wx.removeStorageSync('adminInfo');
+      // 使用新的认证管理器登出
+      adminAuth.logout();
       
       // 跳转到登录页
       setTimeout(() => {

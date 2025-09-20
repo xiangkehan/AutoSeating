@@ -1,0 +1,34 @@
+{
+  "admin_collection": {
+    "read": "doc.openid == auth.openid || get('system_users').where({openid: auth.openid, role: ['admin', 'super_admin']}).count() > 0",
+    "write": "get('system_users').where({openid: auth.openid, role: ['admin', 'super_admin']}).count() > 0"
+  },
+  "system_users": {
+    "read": "doc.openid == auth.openid || get('system_users').where({openid: auth.openid, role: 'super_admin'}).count() > 0",
+    "write": "get('system_users').where({openid: auth.openid, role: 'super_admin'}).count() > 0"
+  },
+  "seat_arrangement": {
+    "read": "doc.openid == auth.openid || get('system_users').where({openid: auth.openid, role: ['admin', 'seat_manager']}).count() > 0",
+    "write": "get('system_users').where({openid: auth.openid, role: ['admin', 'seat_manager']}).count() > 0"
+  },
+  "wish_records": {
+    "read": "doc.openid == auth.openid || get('system_users').where({openid: auth.openid, role: ['admin', 'seat_manager']}).count() > 0",
+    "write": "doc.openid == auth.openid || get('system_users').where({openid: auth.openid, role: ['admin', 'seat_manager']}).count() > 0"
+  },
+  "neighbor_preferences": {
+    "read": "doc.openid == auth.openid || get('system_users').where({openid: auth.openid, role: ['admin', 'seat_manager']}).count() > 0",
+    "write": "doc.openid == auth.openid || get('system_users').where({openid: auth.openid, role: ['admin', 'seat_manager']}).count() > 0"
+  },
+  "session_info": {
+    "read": "get('system_users').where({openid: auth.openid, role: ['admin', 'seat_manager']}).count() > 0",
+    "write": "get('system_users').where({openid: auth.openid, role: ['admin', 'seat_manager']}).count() > 0"
+  },
+  "audit_logs": {
+    "read": "get('system_users').where({openid: auth.openid, role: ['admin', 'super_admin']}).count() > 0",
+    "write": false
+  },
+  "system_config": {
+    "read": "get('system_users').where({openid: auth.openid, role: ['admin', 'super_admin']}).count() > 0",
+    "write": "get('system_users').where({openid: auth.openid, role: 'super_admin'}).count() > 0"
+  }
+}

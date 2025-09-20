@@ -133,11 +133,11 @@
   <!-- 提交按钮 -->
   <view class="submit-section">
     <button 
-      class="submit-btn {{isSubmitting ? 'submitting' : ''}}" 
+      class="submit-btn {{buttonStates.submitBtn.loading ? 'loading' : ''}} {{buttonStates.submitBtn.type === 'success' ? 'success' : ''}}" 
       bindtap="submitWish"
-      disabled="{{isSubmitting}}"
+      disabled="{{buttonStates.submitBtn.disabled}}"
     >
-      {{isSubmitting ? '提交中...' : '提交意愿'}}
+      {{buttonStates.submitBtn.text || '提交意愿'}}
     </button>
     <view class="submit-tip">
       * 提交后可在会话结束前重新修改

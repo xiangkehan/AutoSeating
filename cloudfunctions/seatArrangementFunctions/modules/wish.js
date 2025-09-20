@@ -447,8 +447,136 @@ const updateSessionStatistics = async (sessionId, db) => {
   }
 };
 
+/**
+ * 管理员意愿提交
+ */
+const submitAdminWish = async (event, userInfo, { db, generateId, createResponse }) => {
+  try {
+    const { class_id, wish_data } = event;
+    
+    if (!class_id || !wish_data) {
+      return createResponse(false, null, '缺少必要参数', 400);
+    }
+
+    // 验证管理员权限
+    if (!userInfo || !['admin', 'seat_manager'].includes(userInfo.role)) {
+      return createResponse(false, null, '仅管理员可填写意愿', 403);
+    }
+
+    // 检查班级权限（非排座负责人需要检查）
+    if (userInfo.role !== 'seat_manager' && 
+        userInfo.class_ids && 
+        !userInfo.class_ids.includes(class_id)) {
+      return createResponse(false, null, '您没有该班级的管理权限', 403);
+    }
+
+    // 检查班级是否存在
+    const classResult = await db.collection('classes').where({
+      class_id: class_id
+    }).get();
+
+    if (classResult.data.length === 0) {
+      return createResponse(false, null, '班级不存在', 404);
+    }
+
+    // 检查是否有活跃的排座会话
+    const sessionResult = await db.collection('arrangement_sessions').where({
+      class_id: class_id,
+      status: db.command.in(['collecting', 'active'])
+    }).orderBy('create_time', 'desc').limit(1).get();
+
+    if (sessionResult.data.length === 0) {
+      return createResponse(false, null, '该班级没有活跃的排座会话', 404);
+    }
+
+    const sessionData = sessionResult.data[0];
+
+    // 检查是否在截止时间内（管理员可以超时提交）
+    const now = new Date();
+    const deadline = new Date(sessionData.deadline);
+    const isAfterDeadline = now > deadline;
+
+    // 查找是否已存在意愿记录
+    const existingWish = await db.collection('wishes').where({
+      session_id: sessionData.session_id,
+      admin_id: userInfo.admin_id
+    }).get();
+
+    const wishId = existingWish.data.length > 0 ? 
+      existingWish.data[0].wish_id : 
+      generateId('wish_');
+
+    // 构建意愿数据
+    const wishRecord = {
+      wish_id: wishId,
+      session_id: sessionData.session_id,
+      class_id: class_id,
+      admin_id: userInfo.admin_id,
+      submitter_name: userInfo.name || userInfo.username,
+      user_type: 'admin', // 标识为管理员意愿
+      preferred_seats: wish_data.preferred_seats || [],
+      avoid_seats: wish_data.avoid_seats || [],
+      preferred_neighbors: wish_data.preferred_neighbors || [],
+      avoid_neighbors: wish_data.avoid_neighbors || [],
+      special_requirements: wish_data.special_requirements || '',
+      priority: userInfo.role === 'seat_manager' ? 'high' : 'normal',
+      submitted_after_deadline: isAfterDeadline,
+      submit_time: new Date().toISOString(),
+      update_time: new Date().toISOString()
+    };
+
+    if (existingWish.data.length > 0) {
+      // 更新已有意愿
+      await db.collection('wishes').doc(existingWish.data[0]._id).update({
+        data: {
+          ...wishRecord,
+          update_time: new Date().toISOString()
+        }
+      });
+    } else {
+      // 创建新意愿
+      await db.collection('wishes').add({
+        data: wishRecord
+      });
+    }
+
+    // 记录操作日志
+    try {
+      await db.collection('system_logs').add({
+        data: {
+          log_id: generateId('log_'),
+          user_id: userInfo.admin_id,
+          user_type: 'admin',
+          action: 'submit_admin_wish',
+          details: {
+            class_id: class_id,
+            session_id: sessionData.session_id,
+            is_update: existingWish.data.length > 0,
+            submitted_after_deadline: isAfterDeadline
+          },
+          result: 'success',
+          create_time: new Date().toISOString()
+        }
+      });
+    } catch (logError) {
+      console.warn('Failed to write admin wish log:', logError.message);
+    }
+
+    return createResponse(true, {
+      wish_id: wishId,
+      is_update: existingWish.data.length > 0,
+      submitted_after_deadline: isAfterDeadline
+    }, existingWish.data.length > 0 ? '意愿更新成功' : '意愿提交成功');
+
+  } catch (error) {
+    console.error('submitAdminWish error:', error);
+    return createResponse(false, null, '提交意愿失败: ' + error.message, 500);
+  }
+};
+
 module.exports = {
   submitWish,
   updateWish,
-  getMyWish
+  getMyWish,
+  submitAdminWish
 };

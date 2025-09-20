@@ -1,5 +1,6 @@
 // 管理员意愿填写页面逻辑
 const { createButtonStateManager } = require('../../utils/buttonStateManager');
+const { adminAuth } = require('../../utils/adminAuth');
 
 Page({
   data: {
@@ -20,6 +21,24 @@ Page({
     wx.setNavigationBarTitle({
       title: '管理员意愿填写'
     });
+    
+    // 检查登录状态和权限
+    if (adminAuth.requireLogin('admin-wish')) {
+      return;
+    }
+    
+    // 检查管理员是否有意愿填写权限
+    if (!adminAuth.hasFunctionPermission('submitWish')) {
+      wx.showModal({
+        title: '权限不足',
+        content: '您没有填写意愿的权限',
+        showCancel: false,
+        success: () => {
+          wx.navigateBack();
+        }
+      });
+      return;
+    }
     
     // 初始化按钮状态管理器
     this.buttonManager = createButtonStateManager(this);
@@ -60,31 +79,33 @@ Page({
 
   // 加载管理员信息
   loadAdminInfo() {
-    const adminInfo = wx.getStorageSync('adminInfo');
+    const adminInfo = adminAuth.getAdminInfo();
     if (adminInfo) {
       this.setData({ adminInfo });
     } else {
-      wx.redirectTo({
-        url: '/pages/admin-login/admin-login'
-      });
+      adminAuth.requireLogin('admin-wish');
     }
   },
 
   // 加载班级列表
   async loadClassList() {
     await this.buttonManager.executeAsync('loadClassBtn', async () => {
-      const token = wx.getStorageSync('adminToken');
-      const result = await wx.cloud.callFunction({
+      const result = await adminAuth.callCloudFunction({
         name: 'seatArrangementFunctions',
         data: {
-          type: 'getClassList',
-          token
+          type: 'getClassList'
         }
       });
 
       if (result.result.success) {
+        // 管理员只能选择自己管理的班级
+        const allClasses = result.result.data;
+        const accessibleClasses = adminAuth.isSeatManager() 
+          ? allClasses // 排座负责人可以访问所有班级
+          : allClasses.filter(cls => adminAuth.hasClassPermission(cls.class_id));
+        
         this.setData({
-          classList: result.result.data
+          classList: accessibleClasses
         });
         return result;
       } else {
@@ -99,12 +120,10 @@ Page({
   // 加载同事列表
   async loadColleagueList() {
     await this.buttonManager.executeAsync('loadColleagueBtn', async () => {
-      const token = wx.getStorageSync('adminToken');
-      const result = await wx.cloud.callFunction({
+      const result = await adminAuth.callCloudFunction({
         name: 'seatArrangementFunctions',
         data: {
-          type: 'getColleagueList',
-          token
+          type: 'getColleagueList'
         }
       });
 
@@ -288,11 +307,10 @@ Page({
     }
 
     await this.buttonManager.executeAsync('submitBtn', async () => {
-      const token = wx.getStorageSync('adminToken');
       const preferredColleagues = colleagueList.filter(c => c.selected).map(c => c.id);
       const avoidColleagues = avoidColleagueList.filter(c => c.selected).map(c => c.id);
       
-      const result = await wx.cloud.callFunction({
+      const result = await adminAuth.callCloudFunction({
         name: 'seatArrangementFunctions',
         data: {
           type: 'submitAdminWish',
@@ -302,9 +320,10 @@ Page({
             avoid_seats: avoidSeats.map(s => s.id),
             preferred_neighbors: preferredColleagues,
             avoid_neighbors: avoidColleagues,
-            special_requirements: specialRequirements
-          },
-          token
+            special_requirements: specialRequirements,
+            user_type: 'admin', // 标识为管理员意愿
+            admin_id: adminAuth.getAdminInfo().admin_id
+          }
         }
       });
 

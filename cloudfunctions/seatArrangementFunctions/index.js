@@ -1,5 +1,6 @@
 const cloud = require("wx-server-sdk");
 const jwt = require('jsonwebtoken');
+const DatabaseSecurity = require('./utils/databaseSecurity');
 
 cloud.init({
   env: cloud.DYNAMIC_CURRENT_ENV,
@@ -20,6 +21,8 @@ const resultModule = require('./modules/result');
 const algorithmModule = require('./modules/algorithm');
 const adminModule = require('./modules/admin');
 const dataManager = require('./modules/dataManager');
+const auditModule = require('./modules/audit');
+const systemConfigModule = require('./modules/systemConfig');
 const { checkPermission, checkCollectionPermission } = require('./modules/permission');
 
 // 验证JWT令牌
@@ -181,6 +184,12 @@ exports.main = async (event, context) => {
       userInfo = tokenResult.data;
     }
     
+    // 创建数据库安全实例
+    const dbSecurity = userInfo ? new DatabaseSecurity(db, {
+      ...userInfo,
+      ...getWXContext()
+    }) : null;
+    
     // 依赖注入对象
     const dependencies = {
       db,
@@ -190,7 +199,8 @@ exports.main = async (event, context) => {
       generateId,
       createResponse,
       verifyToken,
-      JWT_SECRET
+      JWT_SECRET,
+      dbSecurity
     };
     
     // 路由处理
@@ -250,7 +260,7 @@ exports.main = async (event, context) => {
         return await adminModule.getColleagueList(event, userInfo, dependencies);
       
       case 'submitAdminWish':
-        return await adminModule.submitAdminWish(event, userInfo, dependencies);
+        return await wishModule.submitAdminWish(event, userInfo, dependencies);
       
       case 'createArrangementSession':
         return await adminModule.createSession(event, userInfo, dependencies);
@@ -290,6 +300,38 @@ exports.main = async (event, context) => {
       
       case 'genericWrite':
         return await dataManager.genericWrite(event, userInfo, dependencies);
+      
+      // ============ 审计日志相关 ============
+      case 'logOperation':
+        return await auditModule.logOperation(event, userInfo, dependencies);
+      
+      case 'getAuditLogs':
+        return await auditModule.getAuditLogs(event, userInfo, dependencies);
+      
+      case 'getAuditStatistics':
+        return await auditModule.getAuditStatistics(event, userInfo, dependencies);
+      
+      case 'getUserOperationHistory':
+        return await auditModule.getUserOperationHistory(event, userInfo, dependencies);
+      
+      case 'cleanupAuditLogs':
+        return await auditModule.cleanupAuditLogs(event, userInfo, dependencies);
+      
+      // ============ 系统配置相关 ============
+      case 'getSystemConfig':
+        return await systemConfigModule.getSystemConfig(event, userInfo, dependencies);
+      
+      case 'updateSystemConfig':
+        return await systemConfigModule.updateSystemConfig(event, userInfo, dependencies);
+      
+      case 'initSystemConfig':
+        return await systemConfigModule.initSystemConfig(event, userInfo, dependencies);
+      
+      case 'getConfigHistory':
+        return await systemConfigModule.getConfigHistory(event, userInfo, dependencies);
+      
+      case 'exportConfig':
+        return await systemConfigModule.exportConfig(event, userInfo, dependencies);
       
       // ============ 原有功能保持兼容 ============
       case 'getOpenId':
