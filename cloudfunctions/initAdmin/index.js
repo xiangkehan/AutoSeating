@@ -26,15 +26,23 @@ exports.main = async (event, context) => {
       };
     }
 
-    // 创建默认管理员
+    // 创建默认管理员（根据项目记忆中的配置）
     const defaultAdmin = {
       admin_id: 'admin_default_' + Date.now(),
       username: 'admin',
       password: 'admin123',
       name: '系统管理员',
       role: 'seat_manager',
-      permissions: 'create_session,manage_students,execute_arrangement,manual_adjust,publish_result,view_statistics,manage_users',
-      class_ids: '',
+      permissions: [
+        'create_session',
+        'manage_students',
+        'execute_arrangement',
+        'manual_adjust',
+        'publish_result',
+        'view_statistics',
+        'manage_users'
+      ],
+      class_ids: [],
       is_active: true,
       create_time: new Date().toISOString()
     };
