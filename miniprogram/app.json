@@ -26,26 +26,26 @@
     "list": [
       {
         "pagePath": "pages/seat-selection/seat-selection",
-        "iconPath": "images/seat_normal.png",
-        "selectedIconPath": "images/seat_selected.png",
+        "iconPath": "images/icons/home.png",
+        "selectedIconPath": "images/icons/home-active.png",
         "text": "选择座位"
       },
       {
         "pagePath": "pages/wish-submit/wish-submit",
-        "iconPath": "images/wish_normal.png",
-        "selectedIconPath": "images/wish_selected.png",
+        "iconPath": "images/icons/examples.png",
+        "selectedIconPath": "images/icons/examples-active.png",
         "text": "我的意愿"
       },
       {
         "pagePath": "pages/result/result",
-        "iconPath": "images/result_normal.png",
-        "selectedIconPath": "images/result_selected.png",
+        "iconPath": "images/icons/business.png",
+        "selectedIconPath": "images/icons/business-active.png",
         "text": "排座结果"
       },
       {
         "pagePath": "pages/profile/profile",
-        "iconPath": "images/profile_normal.png",
-        "selectedIconPath": "images/profile_selected.png",
+        "iconPath": "images/icons/usercenter.png",
+        "selectedIconPath": "images/icons/usercenter-active.png",
         "text": "个人中心"
       }
     ]

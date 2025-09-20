@@ -109,7 +109,7 @@
           bindchange="onClassChange"
         >
           <view class="picker-content {{formData.class_id ? '' : 'placeholder'}}">
-            {{formData.class_id ? (classList.find(item => item.class_id === formData.class_id) || {}).name : '请选择班级'}}
+            {{selectedClassName || '请选择班级'}}
           </view>
         </picker>
       </view>

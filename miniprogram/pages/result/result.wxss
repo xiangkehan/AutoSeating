@@ -1,0 +1,381 @@
+/* pages/result/result.wxss */
+.container {
+  padding: 20rpx;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+/* 加载状态 */
+loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400rpx;
+  font-size: 28rpx;
+  color: #666;
+}
+
+/* 无结果状态 */
+.no-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 40rpx;
+  text-align: center;
+}
+
+.empty-icon {
+  width: 200rpx;
+  height: 200rpx;
+  margin-bottom: 40rpx;
+  opacity: 0.6;
+}
+
+.empty-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.empty-desc {
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 40rpx;
+}
+
+.refresh-btn {
+  background-color: #1976D2;
+  color: white;
+  border-radius: 25rpx;
+  padding: 20rpx 40rpx;
+  font-size: 28rpx;
+  border: none;
+}
+
+/* 结果内容 */
+.result-content {
+  padding-bottom: 120rpx;
+}
+
+/* 卡片基础样式 */
+.my-seat-card,
+.neighbors-card,
+.reasons-card,
+.seat-map-preview {
+  background: white;
+  border-radius: 20rpx;
+  margin-bottom: 30rpx;
+  padding: 30rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.05);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.card-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+/* 我的座位卡片 */
+.satisfaction-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15rpx 25rpx;
+  border-radius: 15rpx;
+  min-width: 120rpx;
+}
+
+.satisfaction-badge.high {
+  background-color: #e8f5e8;
+  border: 1rpx solid #2ed573;
+}
+
+.satisfaction-badge.medium {
+  background-color: #fff3cd;
+  border: 1rpx solid #ffa502;
+}
+
+.satisfaction-badge.low {
+  background-color: #ffeaea;
+  border: 1rpx solid #ff4757;
+}
+
+.satisfaction-text {
+  font-size: 22rpx;
+  margin-bottom: 5rpx;
+}
+
+.satisfaction-badge.high .satisfaction-text {
+  color: #2ed573;
+}
+
+.satisfaction-badge.medium .satisfaction-text {
+  color: #ffa502;
+}
+
+.satisfaction-badge.low .satisfaction-text {
+  color: #ff4757;
+}
+
+.satisfaction-score {
+  font-size: 24rpx;
+  font-weight: bold;
+}
+
+.satisfaction-badge.high .satisfaction-score {
+  color: #2ed573;
+}
+
+.satisfaction-badge.medium .satisfaction-score {
+  color: #ffa502;
+}
+
+.satisfaction-badge.low .satisfaction-score {
+  color: #ff4757;
+}
+
+.seat-info {
+  display: flex;
+  align-items: center;
+  gap: 30rpx;
+}
+
+.seat-visual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.seat-icon {
+  width: 80rpx;
+  height: 80rpx;
+  background-color: #1976D2;
+  border-radius: 15rpx;
+  margin-bottom: 15rpx;
+  position: relative;
+}
+
+.seat-icon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30rpx;
+  height: 30rpx;
+  background-color: white;
+  border-radius: 50%;
+}
+
+.seat-position {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #1976D2;
+}
+
+.seat-details {
+  flex: 1;
+}
+
+.classroom-name {
+  display: block;
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.assign-time {
+  font-size: 24rpx;
+  color: #666;
+}
+
+/* 邻座网格 */
+.neighbors-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: auto auto auto;
+  gap: 20rpx;
+  max-width: 400rpx;
+  margin: 0 auto;
+}
+
+.neighbor-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20rpx;
+  background-color: #f8f9fa;
+  border-radius: 15rpx;
+  position: relative;
+}
+
+.neighbor-item.center {
+  background-color: #1976D2;
+  color: white;
+}
+
+.direction {
+  font-size: 22rpx;
+  color: #666;
+  margin-bottom: 10rpx;
+}
+
+.neighbor-name {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.neighbor-item.center .neighbor-name {
+  color: white;
+}
+
+.my-seat-indicator {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: white;
+}
+
+.preferred-tag {
+  position: absolute;
+  top: -8rpx;
+  right: -8rpx;
+  background-color: #2ed573;
+  color: white;
+  font-size: 18rpx;
+  padding: 5rpx 10rpx;
+  border-radius: 10rpx;
+}
+
+/* 分配原因 */
+.reasons-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15rpx;
+}
+
+.reason-item {
+  display: flex;
+  align-items: center;
+  gap: 15rpx;
+}
+
+.reason-icon {
+  width: 30rpx;
+  height: 30rpx;
+  background-color: #2ed573;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18rpx;
+  flex-shrink: 0;
+}
+
+.reason-text {
+  font-size: 26rpx;
+  color: #333;
+  line-height: 1.4;
+}
+
+/* 座位图预览 */
+.view-full-btn {
+  background-color: #1976D2;
+  color: white;
+  border-radius: 15rpx;
+  padding: 15rpx 25rpx;
+  font-size: 24rpx;
+  border: none;
+}
+
+.mini-seat-map {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.seat-grid-mini {
+  display: inline-block;
+  padding: 20rpx;
+}
+
+.seat-row {
+  display: flex;
+  gap: 10rpx;
+  margin-bottom: 10rpx;
+}
+
+.seat-mini {
+  width: 50rpx;
+  height: 50rpx;
+  border-radius: 8rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20rpx;
+  flex-shrink: 0;
+}
+
+.seat-mini.empty {
+  background-color: #f0f0f0;
+  border: 1rpx dashed #ccc;
+}
+
+.seat-mini.occupied {
+  background-color: #e3f2fd;
+  color: #1976D2;
+  border: 1rpx solid #1976D2;
+}
+
+.seat-mini.my-seat {
+  background-color: #1976D2;
+  color: white;
+  font-weight: bold;
+}
+
+.seat-label {
+  font-size: 18rpx;
+}
+
+/* 操作按钮 */
+.action-buttons {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  padding: 30rpx;
+  background: white;
+  border-top: 1rpx solid #e9ecef;
+  gap: 20rpx;
+}
+
+.share-btn,
+.resubmit-btn {
+  flex: 1;
+  height: 80rpx;
+  border-radius: 25rpx;
+  font-size: 30rpx;
+  border: none;
+}
+
+.share-btn {
+  background-color: #2ed573;
+  color: white;
+}
+
+.resubmit-btn {
+  background-color: #ffa502;
+  color: white;
+}

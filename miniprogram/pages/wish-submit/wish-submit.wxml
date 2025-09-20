@@ -1,0 +1,113 @@
+<!--pages/wish-submit/wish-submit.wxml-->
+<view class="container">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <text class="page-title">意愿确认</text>
+    <text class="page-subtitle">请确认您的座位和邻座偏好，确认无误后提交</text>
+  </view>
+
+  <!-- 座位偏好总结 -->
+  <view class="summary-section">
+    <view class="section-header">
+      <text class="section-title">座位偏好</text>
+      <view class="modify-btn" bindtap="onModifySeat">
+        <text>修改</text>
+      </view>
+    </view>
+    
+    <view class="summary-card">
+      <!-- 期望座位 -->
+      <view class="preference-group" wx:if="{{wishData.preferred_seats && wishData.preferred_seats.length > 0}}">
+        <text class="group-title">期望座位：</text>
+        <view class="seat-list">
+          <text class="seat-item" wx:for="{{wishData.preferred_seats}}" wx:key="*this">
+            第{{item.row}}排第{{item.col}}列
+          </text>
+        </view>
+      </view>
+      
+      <!-- 避免座位 -->
+      <view class="preference-group" wx:if="{{wishData.avoided_seats && wishData.avoided_seats.length > 0}}">
+        <text class="group-title">避免座位：</text>
+        <view class="seat-list">
+          <text class="seat-item avoided" wx:for="{{wishData.avoided_seats}}" wx:key="*this">
+            第{{item.row}}排第{{item.col}}列
+          </text>
+        </view>
+      </view>
+      
+      <!-- 无座位偏好 -->
+      <view class="no-preference" wx:if="{{(!wishData.preferred_seats || wishData.preferred_seats.length === 0) && (!wishData.avoided_seats || wishData.avoided_seats.length === 0)}}">
+        <text class="no-preference-text">暂无座位偏好</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 邻座偏好总结 -->
+  <view class="summary-section">
+    <view class="section-header">
+      <text class="section-title">邻座偏好</text>
+      <view class="modify-btn" bindtap="onModifyNeighbor">
+        <text>修改</text>
+      </view>
+    </view>
+    
+    <view class="summary-card">
+      <!-- 期望邻座 -->
+      <view class="preference-group" wx:if="{{wishData.preferred_neighbors && wishData.preferred_neighbors.length > 0}}">
+        <text class="group-title">期望邻座：</text>
+        <view class="neighbor-list">
+          <view class="neighbor-item" wx:for="{{wishData.preferred_neighbors}}" wx:key="student_id">
+            <text class="neighbor-name">{{item.name}} ({{item.student_number}})</text>
+            <text class="neighbor-relation">{{item.relationship === 'friend' ? '好友' : item.relationship === 'study_partner' ? '学习伙伴' : item.relationship === 'roommate' ? '室友' : '其他'}}</text>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 避免邻座 -->
+      <view class="preference-group" wx:if="{{wishData.avoided_neighbors && wishData.avoided_neighbors.length > 0}}">
+        <text class="group-title">避免邻座：</text>
+        <view class="neighbor-list">
+          <view class="neighbor-item avoided" wx:for="{{wishData.avoided_neighbors}}" wx:key="student_id">
+            <text class="neighbor-name">{{item.name}} ({{item.student_number}})</text>
+            <text class="neighbor-reason">{{item.reason === 'personal_preference' ? '个人偏好' : item.reason === 'personality_conflict' ? '性格不合' : item.reason === 'study_interference' ? '影响学习' : '其他原因'}}</text>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 特殊需求 -->
+      <view class="preference-group" wx:if="{{wishData.special_requirements}}">
+        <text class="group-title">特殊需求：</text>
+        <text class="special-requirements-text">{{wishData.special_requirements}}</text>
+      </view>
+      
+      <!-- 无邻座偏好 -->
+      <view class="no-preference" wx:if="{{(!wishData.preferred_neighbors || wishData.preferred_neighbors.length === 0) && (!wishData.avoided_neighbors || wishData.avoided_neighbors.length === 0) && !wishData.special_requirements}}">
+        <text class="no-preference-text">暂无邻座偏好</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 提交说明 -->
+  <view class="notice-section">
+    <view class="notice-card">
+      <text class="notice-title">提交说明</text>
+      <text class="notice-content">1. 提交后将无法修改，请仔细确认</text>
+      <text class="notice-content">2. 系统将根据您的偏好进行智能排座</text>
+      <text class="notice-content">3. 最终结果会综合所有同学的意愿</text>
+      <text class="notice-content">4. 如有特殊情况请联系班级管理员</text>
+    </view>
+  </view>
+
+  <!-- 提交按钮 -->
+  <view class="submit-section">
+    <button 
+      class="submit-btn {{submitting ? 'submitting' : ''}}" 
+      bindtap="onSubmit"
+      disabled="{{submitting}}"
+    >
+      <text wx:if="{{!submitting}}">{{isModification ? '更新意愿' : '提交意愿'}}</text>
+      <text wx:if="{{submitting}}">提交中...</text>
+    </button>
+  </view>
+</view>

@@ -1,0 +1,284 @@
+/* pages/neighbor-preference/neighbor-preference.wxss */
+.container {
+  padding: 20rpx;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 40rpx;
+}
+
+.page-title {
+  display: block;
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.page-subtitle {
+  display: block;
+  font-size: 28rpx;
+  color: #666;
+}
+
+/* 搜索框样式 */
+.search-container {
+  margin-bottom: 30rpx;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 25rpx;
+  padding: 20rpx 30rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.1);
+}
+
+.search-icon {
+  margin-right: 20rpx;
+}
+
+.search-input {
+  flex: 1;
+  font-size: 28rpx;
+}
+
+/* 已选择区域样式 */
+.selected-section {
+  margin-bottom: 30rpx;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.clear-all-btn {
+  padding: 10rpx 20rpx;
+  background-color: #ff4757;
+  color: white;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+}
+
+.selected-list {
+  background: white;
+  border-radius: 20rpx;
+  overflow: hidden;
+}
+
+.selected-item {
+  display: flex;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.selected-item:last-child {
+  border-bottom: none;
+}
+
+.selected-item.preferred {
+  border-left: 8rpx solid #2ed573;
+}
+
+.selected-item.avoided {
+  border-left: 8rpx solid #ff4757;
+}
+
+.student-info {
+  flex: 1;
+}
+
+.student-name {
+  display: block;
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.student-number {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.relationship-selector,
+.reason-selector {
+  margin-right: 20rpx;
+}
+
+.picker-text {
+  padding: 10rpx 20rpx;
+  background-color: #f8f9fa;
+  border-radius: 10rpx;
+  font-size: 24rpx;
+  color: #666;
+  border: 1rpx solid #e9ecef;
+}
+
+.remove-btn {
+  padding: 10rpx;
+}
+
+/* 同学列表样式 */
+.classmates-section {
+  margin-bottom: 30rpx;
+}
+
+.classmates-list {
+  background: white;
+  border-radius: 20rpx;
+  overflow: hidden;
+}
+
+.classmate-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.classmate-item:last-child {
+  border-bottom: none;
+}
+
+.classmate-item.preferred {
+  background-color: #f0fdf4;
+  border-left: 8rpx solid #2ed573;
+}
+
+.classmate-item.avoided {
+  background-color: #fef2f2;
+  border-left: 8rpx solid #ff4757;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 15rpx;
+}
+
+.action-btn {
+  padding: 15rpx 25rpx !important;
+  font-size: 24rpx !important;
+  border-radius: 15rpx !important;
+  border: none !important;
+}
+
+.preferred-btn {
+  background-color: #2ed573 !important;
+  color: white !important;
+}
+
+.preferred-btn[disabled] {
+  background-color: #cccccc !important;
+  color: #666666 !important;
+}
+
+.avoided-btn {
+  background-color: #ff4757 !important;
+  color: white !important;
+}
+
+.avoided-btn[disabled] {
+  background-color: #cccccc !important;
+  color: #666666 !important;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+}
+
+.status-text {
+  padding: 8rpx 16rpx;
+  border-radius: 12rpx;
+  font-size: 22rpx;
+  color: white;
+}
+
+.status-text.preferred {
+  background-color: #2ed573;
+}
+
+.status-text.avoided {
+  background-color: #ff4757;
+}
+
+/* 特殊需求样式 */
+.special-requirements-section {
+  margin-bottom: 120rpx;
+}
+
+.special-requirements-input {
+  width: 100%;
+  min-height: 150rpx;
+  background: white;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  font-size: 28rpx;
+  border: 1rpx solid #e9ecef;
+  box-sizing: border-box;
+}
+
+.char-count {
+  display: block;
+  text-align: right;
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 10rpx;
+}
+
+/* 加载和空状态 */
+.loading-container,
+.empty-hint {
+  text-align: center;
+  padding: 60rpx 20rpx;
+  color: #999;
+  font-size: 28rpx;
+}
+
+/* 底部操作按钮 */
+.bottom-actions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  padding: 30rpx;
+  background: white;
+  border-top: 1rpx solid #e9ecef;
+  gap: 20rpx;
+}
+
+.action-button {
+  flex: 1;
+  height: 80rpx;
+  border-radius: 25rpx;
+  font-size: 30rpx;
+  border: none;
+}
+
+.action-button.primary {
+  background-color: #1976D2;
+  color: white;
+}
+
+.action-button.secondary {
+  background-color: #f8f9fa;
+  color: #666;
+  border: 1rpx solid #e9ecef;
+}

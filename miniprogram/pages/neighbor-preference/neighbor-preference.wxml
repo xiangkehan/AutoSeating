@@ -1,0 +1,157 @@
+<!--pages/neighbor-preference/neighbor-preference.wxml-->
+<view class="container">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <text class="page-title">邻座偏好设置</text>
+    <text class="page-subtitle">选择您期望的邻座同学和需要避免的同学</text>
+  </view>
+
+  <!-- 搜索框 -->
+  <view class="search-container">
+    <view class="search-box">
+      <icon class="search-icon" type="search" size="16" color="#999"></icon>
+      <input 
+        class="search-input" 
+        placeholder="搜索同学姓名或学号" 
+        value="{{searchText}}"
+        bindinput="onSearchInput"
+      />
+    </view>
+  </view>
+
+  <!-- 已选择的期望邻座 -->
+  <view class="selected-section" wx:if="{{preferredNeighbors.length > 0}}">
+    <view class="section-header">
+      <text class="section-title">期望邻座 ({{preferredNeighbors.length}}/3)</text>
+    </view>
+    <view class="selected-list">
+      <view class="selected-item preferred" wx:for="{{preferredNeighbors}}" wx:key="student_id">
+        <view class="student-info">
+          <text class="student-name">{{item.name}}</text>
+          <text class="student-number">{{item.student_number}}</text>
+        </view>
+        <view class="relationship-selector">
+          <picker 
+            range="{{['好友', '学习伙伴', '室友', '其他']}}" 
+            range-key="{{['friend', 'study_partner', 'roommate', 'other']}}"
+            value="{{item.relationship}}"
+            data-student-id="{{item.student_id}}"
+            bindchange="onRelationshipChange"
+          >
+            <view class="picker-text">{{getRelationshipName(item.relationship)}}</view>
+          </picker>
+        </view>
+        <view class="remove-btn" data-student-id="{{item.student_id}}" bindtap="onRemovePreferred">
+          <icon type="cancel" size="16" color="#ff4757"></icon>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 已选择的避免邻座 -->
+  <view class="selected-section" wx:if="{{avoidedNeighbors.length > 0}}">
+    <view class="section-header">
+      <text class="section-title">避免邻座 ({{avoidedNeighbors.length}}/3)</text>
+    </view>
+    <view class="selected-list">
+      <view class="selected-item avoided" wx:for="{{avoidedNeighbors}}" wx:key="student_id">
+        <view class="student-info">
+          <text class="student-name">{{item.name}}</text>
+          <text class="student-number">{{item.student_number}}</text>
+        </view>
+        <view class="reason-selector">
+          <picker 
+            range="{{['个人偏好', '性格不合', '影响学习', '其他原因']}}" 
+            range-key="{{['personal_preference', 'personality_conflict', 'study_interference', 'other']}}"
+            value="{{item.reason}}"
+            data-student-id="{{item.student_id}}"
+            bindchange="onReasonChange"
+          >
+            <view class="picker-text">{{getReasonName(item.reason)}}</view>
+          </picker>
+        </view>
+        <view class="remove-btn" data-student-id="{{item.student_id}}" bindtap="onRemoveAvoided">
+          <icon type="cancel" size="16" color="#ff4757"></icon>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 同学列表 -->
+  <view class="classmates-section">
+    <view class="section-header">
+      <text class="section-title">班级同学</text>
+      <view class="clear-all-btn" bindtap="onClearAll" wx:if="{{preferredNeighbors.length > 0 || avoidedNeighbors.length > 0}}">
+        <text>清空所有</text>
+      </view>
+    </view>
+    
+    <view class="classmates-list" wx:if="{{!loading}}">
+      <view 
+        class="classmate-item {{getStudentStatus(item)}}" 
+        wx:for="{{filteredClassmates}}" 
+        wx:key="student_id"
+      >
+        <view class="student-info">
+          <text class="student-name">{{item.name}}</text>
+          <text class="student-number">{{item.student_number}}</text>
+        </view>
+        
+        <view class="action-buttons" wx:if="{{getStudentStatus(item) === 'normal'}}">
+          <button 
+            class="action-btn preferred-btn" 
+            size="mini"
+            data-student-id="{{item.student_id}}"
+            bindtap="onAddPreferred"
+            disabled="{{preferredNeighbors.length >= 3}}"
+          >
+            期望
+          </button>
+          <button 
+            class="action-btn avoided-btn" 
+            size="mini"
+            data-student-id="{{item.student_id}}"
+            bindtap="onAddAvoided"
+            disabled="{{avoidedNeighbors.length >= 3}}"
+          >
+            避免
+          </button>
+        </view>
+        
+        <view class="status-indicator" wx:if="{{getStudentStatus(item) !== 'normal'}}">
+          <text class="status-text preferred" wx:if="{{getStudentStatus(item) === 'preferred'}}">已期望</text>
+          <text class="status-text avoided" wx:if="{{getStudentStatus(item) === 'avoided'}}">已避免</text>
+        </view>
+      </view>
+      
+      <view class="empty-hint" wx:if="{{filteredClassmates.length === 0 && !loading}}">
+        <text>没有找到匹配的同学</text>
+      </view>
+    </view>
+    
+    <view class="loading-container" wx:if="{{loading}}">
+      <text>加载同学列表中...</text>
+    </view>
+  </view>
+
+  <!-- 特殊需求 -->
+  <view class="special-requirements-section">
+    <view class="section-header">
+      <text class="section-title">特殊需求说明</text>
+    </view>
+    <textarea 
+      class="special-requirements-input"
+      placeholder="请描述您的特殊座位需求（如：需要靠窗、远离投影等）"
+      value="{{specialRequirements}}"
+      bindinput="onSpecialRequirementsInput"
+      maxlength="200"
+    ></textarea>
+    <text class="char-count">{{specialRequirements.length}}/200</text>
+  </view>
+
+  <!-- 底部操作按钮 -->
+  <view class="bottom-actions">
+    <button class="action-button secondary" bindtap="onPrevious">上一步</button>
+    <button class="action-button primary" bindtap="onNext">下一步</button>
+  </view>
+</view>
