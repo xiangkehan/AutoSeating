@@ -17,6 +17,7 @@ const studentModule = require('./modules/student');
 const sessionModule = require('./modules/session');
 const wishModule = require('./modules/wish');
 const resultModule = require('./modules/result');
+const algorithmModule = require('./modules/algorithm');
 
 // 验证JWT令牌
 const verifyToken = (token) => {
@@ -132,6 +133,10 @@ exports.main = async (event, context) => {
       
       case 'getSessionStatistics':
         return await sessionModule.getStatistics(event, userInfo, dependencies);
+      
+      // ============ 算法相关 ============
+      case 'executeArrangement':
+        return await algorithmModule.executeArrangement(event, userInfo, dependencies);
       
       // ============ 意愿相关 ============
       case 'submitWish':
