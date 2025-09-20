@@ -212,4 +212,4 @@
       <button class=\"modal-btn primary\" bind:tap=\"copyExportData\">复制</button>
     </view>
   </view>
-</view>", "file_path": "c:\\Users\\xjh20\\WeChatProjects\\miniprogram-2\\miniprogram\\pages\\system-config\\system-config.wxml"}]
+</view>

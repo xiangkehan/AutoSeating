@@ -379,4 +379,4 @@ Page({
     this.loadSystemConfig();
     wx.stopPullDownRefresh();
   }
-});", "file_path": "c:\\Users\\xjh20\\WeChatProjects\\miniprogram-2\\miniprogram\\pages\\system-config\\system-config.js"}]
+});

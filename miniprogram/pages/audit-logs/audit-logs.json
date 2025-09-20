@@ -1,5 +1,5 @@
 {
-  \"navigationBarTitleText\": \"审计日志\",
-  \"enablePullDownRefresh\": true,
-  \"onReachBottomDistance\": 50
-}", "file_path": "c:\\Users\\xjh20\\WeChatProjects\\miniprogram-2\\miniprogram\\pages\\audit-logs\\audit-logs.json"}]
+  "navigationBarTitleText": "审计日志",
+  "enablePullDownRefresh": true,
+  "onReachBottomDistance": 50
+}

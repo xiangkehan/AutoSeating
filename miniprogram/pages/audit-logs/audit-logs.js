@@ -264,12 +264,4 @@ Page({
     };
     return textMap[operation] || operation;
   }
-});", "original_text": "操作：${log.operation}
-目标：${log.target}
-详情：${log.details}
-时间：${this.formatDate(log.timestamp)}
-用户：${log.user_name}(${log.user_role})", "new_text": "操作：${this.getOperationText(log.operation)}
-目标：${log.target}
-详情：${log.details}
-时间：${this.formatDate(log.timestamp)}
-用户：${log.user_name}(${log.user_role})"}, {"file_path": "c:\\Users\\xjh20\\WeChatProjects\\miniprogram-2\\miniprogram\\pages\\audit-logs\\audit-logs.js"}]
+});
