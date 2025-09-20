@@ -270,6 +270,13 @@ Page({
     this.setData({ action: 'view' });
   },
 
+  // 导航到管理员登录
+  onAdminLogin: function() {
+    wx.navigateTo({
+      url: '/pages/admin-login/admin-login'
+    });
+  },
+
   // 退出登录
   onLogout: function() {
     wx.showModal({
