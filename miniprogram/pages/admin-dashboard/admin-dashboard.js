@@ -182,6 +182,12 @@ Page({
 
   // 导航到指定页面
   navigateTo(e) {
+    // 检查e和currentTarget是否存在
+    if (!e || !e.currentTarget) {
+      console.error('Invalid event object in navigateTo');
+      return;
+    }
+    
     const page = e.currentTarget.dataset.page;
     
     // 检查页面权限
@@ -195,23 +201,19 @@ Page({
     
     const pageMap = {
       'admin-wish': '/pages/admin-wish/admin-wish',
-      'view-results': '/pages/admin-results/admin-results',
+      'view-results': '/pages/result/result',
       'session-management': '/pages/session-management/session-management',
       'student-management': '/pages/student-management/student-management',
       'classroom-management': '/pages/classroom-management/classroom-management',
-      'execute-arrangement': '/pages/execute-arrangement/execute-arrangement'
+      'execute-arrangement': '/pages/execute-arrangement/execute-arrangement',
+      'audit-logs': '/pages/audit-logs/audit-logs',
+      'system-config': '/pages/system-config/system-config'
     };
 
     const url = pageMap[page];
     if (url) {
-      // 添加点击动画效果
-      const target = e.currentTarget;
-      target.style.transform = 'scale(0.95)';
-      
-      setTimeout(() => {
-        target.style.transform = 'scale(1)';
-        wx.navigateTo({ url });
-      }, 150);
+      // 直接跳转，避免DOM操作可能导致的错误
+      wx.navigateTo({ url });
     } else {
       wx.showToast({
         title: '功能开发中',

@@ -12,7 +12,11 @@
     "pages/audit-logs/audit-logs",
     "pages/system-config/system-config",
     "pages/index/index",
-    "pages/example/index"
+    "pages/example/index",
+    "pages/session-management/session-management",
+    "pages/student-management/student-management",
+    "pages/classroom-management/classroom-management",
+    "pages/execute-arrangement/execute-arrangement"
   ],
   "window": {
     "backgroundColor": "#F6F6F6",

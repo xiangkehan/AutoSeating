@@ -1,0 +1,85 @@
+/* 教室管理页面样式 */
+.container {
+  padding: 30rpx;
+  box-sizing: border-box;
+  min-height: 100vh;
+  background-color: #f6f6f6;
+}
+
+.header {
+  margin-bottom: 30rpx;
+  text-align: center;
+}
+
+.title {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.subtitle {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.content {
+  background-color: #fff;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
+}
+
+.classroom-list {
+  margin-bottom: 30rpx;
+}
+
+.classroom-item {
+  padding: 30rpx;
+  border-bottom: 1rpx solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.classroom-item:last-child {
+  border-bottom: none;
+}
+
+.classroom-name {
+  font-size: 32rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.classroom-info {
+  font-size: 28rpx;
+  color: #999;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 80rpx 0;
+  color: #999;
+}
+
+.empty-text {
+  font-size: 30rpx;
+}
+
+.bottom-button {
+  margin-top: 30rpx;
+}
+
+.primary-btn {
+  background-color: #1976D2;
+  color: #fff;
+  font-size: 32rpx;
+  border-radius: 50rpx;
+  line-height: 90rpx;
+}
+
+.primary-btn:active {
+  opacity: 0.8;
+}

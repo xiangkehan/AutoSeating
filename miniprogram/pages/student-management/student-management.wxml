@@ -1,0 +1,12 @@
+<view class="container">
+  <view class="header">
+    <text class="title">学生管理</text>
+    <text class="subtitle">维护学生信息</text>
+  </view>
+  
+  <view class="content">
+    <view class="empty-state">
+      <text class="empty-text">学生管理功能正在开发中</text>
+    </view>
+  </view>
+</view>

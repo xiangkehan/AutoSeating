@@ -1,0 +1,46 @@
+<view class="container">
+  <view class="header">
+    <text class="title">执行排座</text>
+    <text class="subtitle">运行排座算法</text>
+  </view>
+  
+  <view class="content">
+    <view class="config-section">
+      <view class="config-item">
+        <text class="config-label">选择会话</text>
+        <picker bindchange="onSessionChange" value="{{sessionIndex}}" range="{{sessions}}" range-key="name">
+          <view class="picker">
+            {{sessions[sessionIndex] ? sessions[sessionIndex].name : '请选择会话'}}
+          </view>
+        </picker>
+      </view>
+      
+      <view class="config-item">
+        <text class="config-label">选择教室</text>
+        <picker bindchange="onClassroomChange" value="{{classroomIndex}}" range="{{classrooms}}" range-key="name">
+          <view class="picker">
+            {{classrooms[classroomIndex] ? classrooms[classroomIndex].name : '请选择教室'}}
+          </view>
+        </picker>
+      </view>
+    </view>
+    
+    <view class="algorithm-settings">
+      <text class="settings-title">算法设置</text>
+      <view class="setting-item">
+        <text class="setting-label">考虑学生偏好</text>
+        <switch checked="{{considerPreferences}}" bindchange="onPreferenceChange"></switch>
+      </view>
+      <view class="setting-item">
+        <text class="setting-label">平衡学习成绩</text>
+        <switch checked="{{balanceScores}}" bindchange="onScoreBalanceChange"></switch>
+      </view>
+    </view>
+    
+    <view class="bottom-button">
+      <button class="primary-btn" bindtap="executeArrangement" disabled="{{isExecuting}}">
+        {{isExecuting ? '排座中...' : '开始排座'}}
+      </button>
+    </view>
+  </view>
+</view>
