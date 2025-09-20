@@ -1,0 +1,145 @@
+<!--pages/seat-selection/seat-selection.wxml-->
+<view class="container">
+  <!-- 加载状态 -->
+  <loading wx:if="{{loading}}">加载中...</loading>
+  
+  <!-- 无会话状态 -->
+  <view wx:elif="{{!hasSession}}" class="no-session">
+    <image class="empty-icon" src="/images/empty-session.png" mode="aspectFit"></image>
+    <text class="empty-title">暂无排座会话</text>
+    <text class="empty-desc">当前没有进行中的座位安排，请等待老师发起</text>
+    <button class="refresh-btn" bindtap="loadCurrentSession">刷新</button>
+  </view>
+  
+  <!-- 正常状态 -->
+  <view wx:else class="seat-selection">
+    <!-- 会话信息 -->
+    <view class="session-info">
+      <view class="session-header">
+        <text class="session-title">{{currentSession.title}}</text>
+        <text class="session-status {{currentSession.status}}">{{currentSession.status === 'collecting' ? '收集中' : '已结束'}}</text>
+      </view>
+      <view class="session-details">
+        <text class="classroom-name">教室：{{classroom.name}}</text>
+        <text class="deadline">截止时间：{{currentSession.deadline}}</text>
+      </view>
+    </view>
+
+    <!-- 操作说明 -->
+    <view class="instructions">
+      <view class="instruction-item">
+        <view class="instruction-icon preferred"></view>
+        <text class="instruction-text">绿色表示期望座位</text>
+      </view>
+      <view class="instruction-item">
+        <view class="instruction-icon avoided"></view>
+        <text class="instruction-text">红色表示不期望座位</text>
+      </view>
+      <view class="instruction-item">
+        <view class="instruction-icon unavailable"></view>
+        <text class="instruction-text">灰色表示不可选择</text>
+      </view>
+    </view>
+
+    <!-- 选择模式切换 -->
+    <view class="mode-selector">
+      <radio-group bindchange="onModeChange">
+        <label class="mode-option {{selectionMode === 'preferred' ? 'active' : ''}}">
+          <radio value="preferred" checked="{{selectionMode === 'preferred'}}" color="#4CAF50"/>
+          <text>选择期望座位 ({{selectedPreferred.length}}/5)</text>
+        </label>
+        <label class="mode-option {{selectionMode === 'avoided' ? 'active' : ''}}">
+          <radio value="avoided" checked="{{selectionMode === 'avoided'}}" color="#f44336"/>
+          <text>选择避免座位 ({{selectedAvoided.length}}/5)</text>
+        </label>
+      </radio-group>
+    </view>
+
+    <!-- 座位图区域 -->
+    <view class="seat-map-container">
+      <!-- 控制按钮 -->
+      <view class="map-controls">
+        <button class="control-btn" bindtap="onResetView">重置视图</button>
+        <button class="control-btn" bindtap="onClearSelection">清空选择</button>
+      </view>
+
+      <!-- 座位图 -->
+      <scroll-view 
+        class="seat-map-scroll" 
+        scroll-x="{{true}}" 
+        scroll-y="{{true}}"
+        bindtouchstart="onTouchStart"
+        bindtouchmove="onTouchMove"
+      >
+        <view 
+          class="seat-map" 
+          style="transform: scale({{scale}}) translate({{translateX}}px, {{translateY}}px)"
+        >
+          <!-- 讲台 -->
+          <view class="podium">
+            <text>讲台</text>
+          </view>
+
+          <!-- 座位网格 -->
+          <view class="seat-grid" style="grid-template-columns: repeat({{classroom.layout_config.dimensions.width}}, 1fr)">
+            <view 
+              wx:for="{{seats}}" 
+              wx:key="seat_id"
+              class="seat-item {{getSeatStatus(item)}} {{!canModify ? 'disabled' : ''}}"
+              data-seat-id="{{item.seat_id}}"
+              bindtap="onSeatTap"
+            >
+              <!-- 座位编号 -->
+              <text class="seat-number">{{item.position.row}}-{{item.position.col}}</text>
+              
+              <!-- 优先级标识 -->
+              <text wx:if="{{getSeatStatus(item) === 'preferred'}}" class="priority-badge">{{getSeatPriority(item)}}</text>
+              
+              <!-- 不可用标识 -->
+              <text wx:if="{{!item.is_available}}" class="unavailable-badge">✕</text>
+            </view>
+          </view>
+
+          <!-- 过道标识 -->
+          <view class="aisles">
+            <view wx:for="{{classroom.layout_config.elements.aisles}}" wx:key="index" class="aisle" style="{{item.style}}"></view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 选择统计 -->
+    <view class="selection-summary">
+      <view class="summary-item">
+        <text class="summary-label">期望座位</text>
+        <view class="summary-content">
+          <block wx:if="{{selectedPreferred.length > 0}}">
+            <text wx:for="{{selectedPreferred}}" wx:key="seat_id" class="seat-tag preferred">
+              {{item.position.row}}-{{item.position.col}} ({{item.priority}})
+            </text>
+          </block>
+          <text wx:else class="empty-text">未选择</text>
+        </view>
+      </view>
+      
+      <view class="summary-item">
+        <text class="summary-label">避免座位</text>
+        <view class="summary-content">
+          <block wx:if="{{selectedAvoided.length > 0}}">
+            <text wx:for="{{selectedAvoided}}" wx:key="seat_id" class="seat-tag avoided">
+              {{item.position.row}}-{{item.position.col}}
+            </text>
+          </block>
+          <text wx:else class="empty-text">未选择</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 底部操作 -->
+    <view class="bottom-actions">
+      <button class="next-btn" bindtap="onNext" disabled="{{!canModify}}">
+        下一步：设置邻座偏好
+      </button>
+    </view>
+  </view>
+</view>
