@@ -12,7 +12,8 @@ Page({
       totalWishes: 0
     },
     recentActivities: [],
-    buttonStates: {}
+    buttonStates: {},
+    cloudFunctionUrl: '' // 云端接口地址
   },
 
   onLoad() {
@@ -63,8 +64,16 @@ Page({
       successText: '初始化成功'
     });
     
+    this.buttonManager.initButton('copyCloudUrlBtn', {
+      text: '复制',
+      type: 'primary',
+      loadingText: '复制中...',
+      successText: '已复制'
+    });
+    
     this.loadAdminInfo();
     this.loadDashboardData();
+    this.loadCloudFunctionUrl();
   },
 
   onShow() {
@@ -251,6 +260,55 @@ Page({
       return { success: true };
     }, {
       successText: '已退出登录'
+    });
+  },
+  
+  // 加载云端接口地址
+  async loadCloudFunctionUrl() {
+    try {
+      // 获取云环境配置
+      const app = getApp();
+      const envId = app.globalData.env || 'cloud1-4gumvlngdea8db4b';
+      
+      // 构建云端接口地址格式
+      // 微信云函数的接口地址格式通常为: https://api.weixin.qq.com/tcb/invokecloudfunction?env={env_id}&name=seatArrangementFunctions
+      // 但对于离线管理端，需要的是完整的HTTP API地址，这里使用标准格式
+      const cloudUrl = `https://${envId}.api.weixin.qq.com/tcb/invokecloudfunction?env=${envId}&name=seatArrangementFunctions`;
+      
+      this.setData({
+        cloudFunctionUrl: cloudUrl
+      });
+    } catch (error) {
+      console.error('加载云端接口地址失败:', error);
+    }
+  },
+  
+  // 复制云端接口地址
+  async copyCloudFunctionUrl() {
+    if (!this.data.cloudFunctionUrl) {
+      wx.showToast({
+        title: '接口地址为空',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    await this.buttonManager.executeAsync('copyCloudUrlBtn', async () => {
+      // 使用微信API复制文本
+      wx.setClipboardData({
+        data: this.data.cloudFunctionUrl,
+        success: () => {
+          wx.showToast({
+            title: '复制成功',
+            icon: 'success'
+          });
+        }
+      });
+      
+      return { success: true };
+    }, {
+      successText: '已复制',
+      clickInterval: 1000
     });
   }
 });

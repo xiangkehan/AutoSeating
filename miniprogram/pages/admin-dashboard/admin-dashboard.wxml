@@ -47,6 +47,27 @@
     </view>
   </view>
 
+  <!-- 云端接口地址 -->
+  <view class="cloud-url-section">
+    <view class="section-title">离线管理端配置信息</view>
+    <view class="cloud-url-container">
+      <view class="url-label">云端接口地址：</view>
+      <view class="url-content">
+        <text class="url-text">{{cloudFunctionUrl || '加载中...'}}</text>
+        <view 
+          class="copy-btn {{buttonStates.copyCloudUrlBtn.loading ? 'loading' : ''}}"
+          bindtap="copyCloudFunctionUrl"
+        >
+          <text class="copy-icon">📋</text>
+          <text class="copy-text">{{buttonStates.copyCloudUrlBtn.text || '复制'}}</text>
+        </view>
+      </view>
+      <view class="url-tip">
+        <text>请将此地址配置到离线管理端的系统设置中，用于数据同步</text>
+      </view>
+    </view>
+  </view>
+
   <!-- 功能模块 -->
   <view class="modules-section">
     <view class="module-title">功能模块</view>
