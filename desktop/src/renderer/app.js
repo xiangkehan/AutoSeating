@@ -8,10 +8,14 @@ class DesktopAppUI {
             lastSyncTime: null
         };
         this.buttonManager = new ButtonStateManager();
+        this.errorReporter = null;
     }
 
     // 初始化应用
     async init() {
+        // 初始化错误报告器
+        this.initErrorReporter();
+        
         this.setupEventListeners();
         this.setupNavigation();
         this.loadSettings();
@@ -19,6 +23,66 @@ class DesktopAppUI {
         await this.loadDashboardData();
         
         console.log('桌面应用UI初始化完成');
+    }
+    
+    // 初始化错误报告器
+    initErrorReporter() {
+        try {
+            // 如果ErrorReporter已在全局作用域中定义（通过script标签加载）
+            if (window.ErrorReporter) {
+                this.errorReporter = new window.ErrorReporter();
+            } else {
+                console.log('错误报告器模块未加载，使用默认错误处理');
+                // 创建一个简单的错误报告器实现
+                this.errorReporter = {
+                    reportError: (errorType, errorCode, message, details = {}) => {
+                        console.error(`[${errorType}] [${errorCode}]: ${message}`, details);
+                        this.showToast(`错误: ${message}`, 'error');
+                        return { type: errorType, code: errorCode, message, details, timestamp: new Date() };
+                    }
+                };
+            }
+            
+            // 设置全局错误处理
+            this.setupGlobalErrorHandling();
+        } catch (error) {
+            console.warn('初始化错误报告器失败:', error);
+        }
+    }
+    
+    // 设置全局错误处理
+    setupGlobalErrorHandling() {
+        // 捕获未处理的Promise拒绝
+        window.addEventListener('unhandledrejection', (event) => {
+            console.error('未处理的Promise拒绝:', event.reason);
+            
+            // 如果是云函数相关的错误，使用错误报告器
+            if (event.reason && (event.reason.message.includes('云函数') || event.reason.code === 'ENOTFOUND')) {
+                this.errorReporter?.reportError(
+                    '未处理的Promise错误',
+                    event.reason.code || 'UNKNOWN',
+                    event.reason.message || '未知的Promise拒绝错误',
+                    { error: event.reason }
+                );
+            }
+        });
+        
+        // 捕获全局错误
+        window.addEventListener('error', (event) => {
+            console.error('全局错误:', event.error);
+            
+            // 避免重复报告错误
+            if (event.error && !event.error._reported) {
+                event.error._reported = true;
+                
+                this.errorReporter?.reportError(
+                    '全局JavaScript错误',
+                    event.error.code || 'JAVASCRIPT_ERROR',
+                    event.error.message || '未知的JavaScript错误',
+                    { error: event.error, filename: event.filename, lineno: event.lineno }
+                );
+            }
+        });
     }
 
     // 设置事件监听器
@@ -235,6 +299,7 @@ class DesktopAppUI {
                 const indicator = document.getElementById('statusIndicator');
                 const statusText = document.getElementById('statusText');
                 const lastSyncTime = document.getElementById('lastSyncTime');
+                const connectionStatusText = document.getElementById('connectionStatusText');
                 
                 if (indicator && statusText) {
                     indicator.className = `status-indicator ${status.isOnline ? 'online' : 'offline'}`;
@@ -244,9 +309,84 @@ class DesktopAppUI {
                 if (lastSyncTime && status.lastSyncTime) {
                     lastSyncTime.textContent = `最后同步: ${new Date(status.lastSyncTime).toLocaleString()}`;
                 }
+                
+                // 更新详细连接状态
+                if (connectionStatusText && status.connectionStatus) {
+                    const connStatus = status.connectionStatus;
+                    if (!status.isOnline && connStatus.errorType) {
+                        let detailedMessage = '';
+                        switch(connStatus.errorType) {
+                            case 'ENOTFOUND':
+                                detailedMessage = '无法解析云函数地址，请检查URL格式是否正确';
+                                break;
+                            case 'ECONNREFUSED':
+                                detailedMessage = '连接被拒绝，请确认云函数服务正在运行';
+                                break;
+                            case 'TIMEOUT':
+                                detailedMessage = '连接超时，请检查网络连接和云函数响应时间';
+                                break;
+                            default:
+                                detailedMessage = connStatus.errorMessage || '连接失败';
+                        }
+                        connectionStatusText.textContent = `连接状态: ${detailedMessage}`;
+                        connectionStatusText.className = 'connection-status-text error';
+                        
+                        // 如果有连接错误，并且是第一次检测到，显示错误报告
+                        if (this.errorReporter && 
+                            !this.lastConnectionErrorType && 
+                            connStatus.errorType !== 'DEFAULT_URL') {
+                            this.errorReporter.reportError(
+                                '云函数连接错误',
+                                connStatus.errorType,
+                                detailedMessage,
+                                {
+                                    networkStatus: '离线',
+                                    cloudEndpoint: connStatus.endpoint,
+                                    lastCheckTime: connStatus.lastCheckTime
+                                }
+                            );
+                        }
+                        
+                        // 保存当前错误类型，避免重复报告
+                        this.lastConnectionErrorType = connStatus.errorType;
+                    } else if (connStatus.endpoint === 'https://your-cloud-function-url') {
+                        connectionStatusText.textContent = '连接状态: 请在系统设置中配置正确的云函数地址';
+                        connectionStatusText.className = 'connection-status-text warning';
+                        
+                        // 如果使用了默认地址，提示用户
+                        if (this.errorReporter && !this.lastConnectionErrorType) {
+                            this.errorReporter.reportError(
+                                '配置警告',
+                                'DEFAULT_URL',
+                                '请在系统设置中配置正确的云函数地址',
+                                {
+                                    networkStatus: '离线',
+                                    cloudEndpoint: connStatus.endpoint
+                                }
+                            );
+                            this.lastConnectionErrorType = 'DEFAULT_URL';
+                        }
+                    } else {
+                        connectionStatusText.textContent = `连接状态: 正常 (${new Date(connStatus.lastCheckTime).toLocaleTimeString()})`;
+                        connectionStatusText.className = 'connection-status-text success';
+                        
+                        // 重置错误状态
+                        this.lastConnectionErrorType = null;
+                    }
+                }
             }
         } catch (error) {
             console.error('获取同步状态失败:', error);
+            
+            // 报告获取同步状态失败的错误
+            if (this.errorReporter) {
+                this.errorReporter.reportError(
+                    '系统错误',
+                    'SYNC_STATUS_ERROR',
+                    '获取同步状态失败',
+                    { error: error.message }
+                );
+            }
         }
     }
 
@@ -337,9 +477,17 @@ class DesktopAppUI {
             };
             
             if (window.electronAPI) {
+                // 获取当前已保存的云端接口地址
+                const currentSettings = await window.electronAPI.getSettings();
+                
                 const result = await window.electronAPI.saveSettings(settings);
                 if (result.success) {
                     this.showToast('设置保存成功', 'success');
+                    
+                    // 如果云端接口地址发生变化，通知主进程更新同步管理器
+                    if (settings.cloudEndpoint && settings.cloudEndpoint !== currentSettings.cloudEndpoint) {
+                        window.electronAPI.updateSyncManagerCloudEndpoint(settings.cloudEndpoint);
+                    }
                 } else {
                     throw new Error('保存设置失败');
                 }

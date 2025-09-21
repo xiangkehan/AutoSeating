@@ -5,7 +5,12 @@
  */
 const wxLogin = async (event, { db, getWXContext, generateToken, generateId, createResponse }) => {
   try {
-    const { code, userInfo } = event;
+    const { code, userInfo, test } = event;
+    
+    // 如果是测试模式，直接返回成功响应
+    if (test) {
+      return createResponse(true, { test: true, message: 'Connection test successful' }, '测试连接成功');
+    }
     
     if (!code) {
       return createResponse(false, null, '缺少微信授权码', 400);

@@ -217,6 +217,20 @@ class DesktopApp {
         autoSync: this.store.get('autoSync', true)
       };
     });
+
+    // 更新同步管理器的云端接口地址
+    ipcMain.handle('updateSyncManagerCloudEndpoint', async (event, endpoint) => {
+      if (this.syncManager) {
+        try {
+          const updatedEndpoint = this.syncManager.updateCloudEndpoint(endpoint);
+          return { success: true, endpoint: updatedEndpoint };
+        } catch (error) {
+          console.error('更新云端接口地址失败:', error);
+          return { success: false, error: error.message };
+        }
+      }
+      return { success: false, error: '同步管理器未初始化' };
+    });
   }
 
   // 设置应用事件

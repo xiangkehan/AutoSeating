@@ -3,6 +3,20 @@ const LocalDatabase = require('../storage/localdb');
 // 使用相对路径导入axios模块以解决Electron环境下的模块查找问题
 const axios = require('../../desktop/node_modules/axios');
 
+// 尝试导入错误报告器，如果在主进程中不可用则创建简单的模拟版本
+let ErrorReporter = null;
+try {
+  // 在主进程中，我们使用简单的错误处理逻辑
+  ErrorReporter = class {
+    reportError(errorType, errorCode, message, details = {}) {
+      console.error(`[${errorType}] [${errorCode}]: ${message}`, details);
+      return { type: errorType, code: errorCode, message, details, timestamp: new Date() };
+    }
+  };
+} catch (e) {
+  console.warn('无法加载错误报告器模块:', e);
+}
+
 class SyncManager {
   constructor(options = {}) {
     this.localDB = new LocalDatabase(options.dbPath);
@@ -13,6 +27,11 @@ class SyncManager {
     this.isSyncing = false;
     this.syncTimer = null;
     this.authToken = null;
+    
+    // 连接状态相关属性
+    this.lastConnectionCheck = null;
+    this.connectionErrorType = null;
+    this.connectionErrorMessage = null;
   }
 
   // 初始化同步管理器
@@ -20,8 +39,30 @@ class SyncManager {
     await this.localDB.initialize();
     await this.localDB.createTables();
     
-    // 检查网络状态
-    this.checkNetworkStatus();
+    // 初始化错误报告器
+    this.errorReporter = new ErrorReporter();
+    
+    // 检查是否使用了默认的云函数地址
+    if (this.cloudEndpoint === 'https://your-cloud-function-url' || !this.cloudEndpoint) {
+      console.warn('⚠️ 警告: 当前使用的是默认云函数地址，请在系统设置中更新为正确的云函数地址');
+      this.isOnline = false;
+      
+      // 记录默认地址警告
+      if (this.errorReporter) {
+        this.errorReporter.reportError(
+          '配置警告', 
+          'DEFAULT_URL', 
+          '当前使用的是默认云函数地址，请在系统设置中更新为正确的云函数地址',
+          {
+            networkStatus: '离线',
+            cloudEndpoint: this.cloudEndpoint
+          }
+        );
+      }
+    } else {
+      // 检查网络状态
+      this.checkNetworkStatus();
+    }
     
     // 启动定期同步
     this.startPeriodicSync();
@@ -31,13 +72,111 @@ class SyncManager {
 
   // 检查网络状态
   async checkNetworkStatus() {
+    const now = new Date();
+    this.lastConnectionCheck = now;
+    
     try {
-      const response = await axios.get(this.cloudEndpoint + '/health', {
-        timeout: 5000
+      // 验证云函数地址格式是否正确
+      if (!this.cloudEndpoint || this.cloudEndpoint === 'https://your-cloud-function-url') {
+        this.isOnline = false;
+        this.connectionErrorType = 'DEFAULT_URL';
+        this.connectionErrorMessage = '云函数地址未设置或使用了默认地址';
+        console.warn('⚠️ 警告: 云函数地址未设置或使用了默认地址，请在系统设置中更新');
+        return false;
+      }
+      
+      // 使用正确的POST请求格式与云函数通信
+      const response = await axios.post(this.cloudEndpoint, {
+        type: 'wxLogin', // 使用公开的wxLogin接口进行网络状态检查
+        test: true // 添加测试标记，避免实际登录行为
+      }, {
+        timeout: 5000,
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
-      this.isOnline = response.status === 200;
+      // 只要能接收到响应，就认为网络在线
+      this.isOnline = true;
+      this.connectionErrorType = null;
+      this.connectionErrorMessage = null;
+      console.log('云函数连接成功');
     } catch (error) {
       this.isOnline = false;
+      // 提供更详细的错误信息并记录连接状态
+      if (error.code === 'ENOTFOUND') {
+        console.error('云函数连接失败: 无法解析云函数地址，请检查地址是否正确');
+        this.connectionErrorType = 'ENOTFOUND';
+        this.connectionErrorMessage = '无法解析云函数地址，请检查地址是否正确';
+        
+        // 记录详细的错误报告
+        if (this.errorReporter) {
+          this.errorReporter.reportError(
+            '网络连接错误', 
+            'ENOTFOUND', 
+            '无法解析云函数地址，请检查地址是否正确',
+            {
+              networkStatus: '离线',
+              cloudEndpoint: this.cloudEndpoint,
+              errorDetails: error
+            }
+          );
+        }
+      } else if (error.code === 'ECONNREFUSED') {
+        console.error('云函数连接失败: 连接被拒绝，请确认云函数已部署并可访问');
+        this.connectionErrorType = 'ECONNREFUSED';
+        this.connectionErrorMessage = '连接被拒绝，请确认云函数已部署并可访问';
+        
+        // 记录详细的错误报告
+        if (this.errorReporter) {
+          this.errorReporter.reportError(
+            '网络连接错误', 
+            'ECONNREFUSED', 
+            '连接被拒绝，请确认云函数已部署并可访问',
+            {
+              networkStatus: '离线',
+              cloudEndpoint: this.cloudEndpoint,
+              errorDetails: error
+            }
+          );
+        }
+      } else if (error.response) {
+        console.error(`云函数连接失败: 服务器返回错误状态码 ${error.response.status}`);
+        this.connectionErrorType = `HTTP_${error.response.status}`;
+        this.connectionErrorMessage = `服务器返回错误状态码 ${error.response.status}`;
+        
+        // 记录详细的错误报告
+        if (this.errorReporter) {
+          this.errorReporter.reportError(
+            '服务器响应错误', 
+            `HTTP_${error.response.status}`, 
+            `服务器返回错误状态码 ${error.response.status}`,
+            {
+              networkStatus: '在线',
+              cloudEndpoint: this.cloudEndpoint,
+              errorDetails: error,
+              responseData: error.response.data
+            }
+          );
+        }
+      } else {
+        console.error('云函数连接失败:', error.message);
+        this.connectionErrorType = 'UNKNOWN';
+        this.connectionErrorMessage = error.message || '未知错误';
+        
+        // 记录详细的错误报告
+        if (this.errorReporter) {
+          this.errorReporter.reportError(
+            '未知错误', 
+            'UNKNOWN', 
+            error.message || '未知错误',
+            {
+              networkStatus: '离线',
+              cloudEndpoint: this.cloudEndpoint,
+              errorDetails: error
+            }
+          );
+        }
+      }
     }
     
     console.log('网络状态:', this.isOnline ? '在线' : '离线');
@@ -47,6 +186,17 @@ class SyncManager {
   // 设置认证令牌
   setAuthToken(token) {
     this.authToken = token;
+  }
+
+  // 更新云端接口地址
+  updateCloudEndpoint(endpoint) {
+    if (endpoint && endpoint !== this.cloudEndpoint) {
+      this.cloudEndpoint = endpoint;
+      console.log('云端接口地址已更新:', endpoint);
+      // 立即检查新地址的网络状态
+      this.checkNetworkStatus();
+    }
+    return this.cloudEndpoint;
   }
 
   // 启动定期同步
@@ -137,7 +287,7 @@ class SyncManager {
   // 下载云端数据到本地
   async downloadCloudData() {
     try {
-      const response = await axios.post(this.cloudEndpoint + '/getUpdatedData', {
+      const response = await axios.post(this.cloudEndpoint, {
         type: 'getUpdatedData',
         token: this.authToken,
         lastSyncTime: await this.getLastSyncTime()
@@ -175,7 +325,7 @@ class SyncManager {
   // 上传表数据
   async uploadTableData(tableName, data) {
     try {
-      const response = await axios.post(this.cloudEndpoint + '/syncData', {
+      const response = await axios.post(this.cloudEndpoint, {
         type: 'syncData',
         table: tableName,
         data: data,
@@ -266,7 +416,14 @@ class SyncManager {
       isSyncing: this.isSyncing,
       lastSyncTime,
       pendingData: Object.values(stats).reduce((total, stat) => total + stat.pending, 0),
-      tables: stats
+      tables: stats,
+      // 添加详细的连接状态信息
+      connectionStatus: {
+        endpoint: this.cloudEndpoint,
+        lastCheckTime: this.lastConnectionCheck,
+        errorType: this.connectionErrorType,
+        errorMessage: this.connectionErrorMessage
+      }
     };
   }
 

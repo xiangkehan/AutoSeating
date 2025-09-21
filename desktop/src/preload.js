@@ -6,6 +6,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // 同步管理
   getSyncStatus: () => ipcRenderer.invoke('get-sync-status'),
   performSync: () => ipcRenderer.invoke('perform-sync'),
+  updateSyncManagerCloudEndpoint: (endpoint) => ipcRenderer.invoke('updateSyncManagerCloudEndpoint', endpoint),
   
   // 数据操作
   getLocalData: (tableName) => ipcRenderer.invoke('get-local-data', tableName),

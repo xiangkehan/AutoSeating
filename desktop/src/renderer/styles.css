@@ -83,6 +83,34 @@ body {
     50% { opacity: 0.5; }
 }
 
+/* 连接状态文本样式 */
+.connection-status-text {
+    font-size: 12px;
+    margin-top: 4px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: #f5f6fa;
+    border: 1px solid #e1e4e8;
+}
+
+.connection-status-text.success {
+    color: #27ae60;
+    background: #d5edda;
+    border-color: #c3e6cb;
+}
+
+.connection-status-text.warning {
+    color: #f39c12;
+    background: #fff3cd;
+    border-color: #ffeaa7;
+}
+
+.connection-status-text.error {
+    color: #e74c3c;
+    background: #f8d7da;
+    border-color: #f5c6cb;
+}
+
 .sync-btn {
     background: #3498db;
     color: white;

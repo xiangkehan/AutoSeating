@@ -294,21 +294,32 @@ Page({
     }
     
     await this.buttonManager.executeAsync('copyCloudUrlBtn', async () => {
-      // 使用微信API复制文本
-      wx.setClipboardData({
-        data: this.data.cloudFunctionUrl,
-        success: () => {
-          wx.showToast({
-            title: '复制成功',
-            icon: 'success'
-          });
-        }
+      // 使用Promise包装wx.setClipboardData以确保操作完成
+      return new Promise((resolve, reject) => {
+        wx.setClipboardData({
+          data: this.data.cloudFunctionUrl,
+          success: () => {
+            wx.showToast({
+              title: '复制成功',
+              icon: 'success'
+            });
+            resolve({ success: true });
+          },
+          fail: (error) => {
+            console.error('复制失败:', error);
+            wx.showToast({
+              title: '复制失败',
+              icon: 'none'
+            });
+            reject(new Error('复制失败'));
+          }
+        });
       });
-      
-      return { success: true };
     }, {
       successText: '已复制',
-      clickInterval: 1000
+      clickInterval: 1000,
+      useErrorModal: true,
+      errorTitle: '复制失败'
     });
   }
 });

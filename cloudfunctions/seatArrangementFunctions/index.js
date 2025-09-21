@@ -23,6 +23,7 @@ const adminModule = require('./modules/admin');
 const dataManager = require('./modules/dataManager');
 const auditModule = require('./modules/audit');
 const systemConfigModule = require('./modules/systemConfig');
+const syncManager = require('./modules/syncManager');
 const { checkPermission, checkCollectionPermission } = require('./modules/permission');
 
 // 验证JWT令牌
@@ -332,6 +333,13 @@ exports.main = async (event, context) => {
       
       case 'exportConfig':
         return await systemConfigModule.exportConfig(event, userInfo, dependencies);
+      
+      // ============ 数据同步相关 ============
+      case 'syncData':
+        return await syncManager.syncData(event, userInfo, dependencies);
+      
+      case 'getUpdatedData':
+        return await syncManager.getUpdatedData(event, userInfo, dependencies);
       
       // ============ 原有功能保持兼容 ============
       case 'getOpenId':
