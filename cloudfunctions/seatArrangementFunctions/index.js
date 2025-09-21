@@ -1,6 +1,6 @@
 const cloud = require("wx-server-sdk");
 const jwt = require('jsonwebtoken');
-const DatabaseSecurity = require('./utils/databaseSecurity');
+const DatabaseSecurity = require('../utils/databaseSecurity');
 
 cloud.init({
   env: cloud.DYNAMIC_CURRENT_ENV,
