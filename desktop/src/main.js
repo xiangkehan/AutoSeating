@@ -2,7 +2,7 @@
 const { app, BrowserWindow, Menu, ipcMain, dialog } = require('electron');
 const path = require('path');
 const Store = require('electron-store');
-const SyncManager = require('../offline/sync/syncManager');
+const SyncManager = require('../../offline/sync/syncManager.js');
 
 class DesktopApp {
   constructor() {

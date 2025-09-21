@@ -1,6 +1,7 @@
 // 数据同步管理器 - 处理在线和离线数据同步
 const LocalDatabase = require('../storage/localdb');
-const axios = require('axios');
+// 使用相对路径导入axios模块以解决Electron环境下的模块查找问题
+const axios = require('../../desktop/node_modules/axios');
 
 class SyncManager {
   constructor(options = {}) {

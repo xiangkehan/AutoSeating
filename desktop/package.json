@@ -4,8 +4,8 @@
   "description": "自动排座位系统 - Win11桌面版",
   "main": "src/main.js",
   "scripts": {
-    "start": "electron .",
-    "dev": "electron . --dev",
+    "start": "chcp 65001 && electron .",
+    "dev": "chcp 65001 && electron . --dev",
     "build": "electron-builder",
     "build-win": "electron-builder --win",
     "pack": "electron-builder --dir",
@@ -21,15 +21,16 @@
   "license": "MIT",
   "devDependencies": {
     "electron": "^22.0.0",
-    "electron-builder": "^24.0.0"
+    "electron-builder": "^24.0.0",
+    "electron-rebuild": "^3.2.9"
   },
   "dependencies": {
-    "sqlite3": "^5.1.6",
-    "axios": "^1.4.0",
-    "xlsx": "^0.18.5",
+    "axios": "^0.27.2",
     "electron-store": "^8.1.0",
+    "fs-extra": "^11.1.1",
     "path": "^0.12.7",
-    "fs-extra": "^11.1.1"
+    "sqlite3": "^5.1.7",
+    "xlsx": "^0.18.5"
   },
   "build": {
     "appId": "com.seatarrangement.desktop",

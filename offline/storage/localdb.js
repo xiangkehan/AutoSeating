@@ -1,5 +1,6 @@
 // 离线数据存储模块 - 使用SQLite作为本地数据库
-const sqlite3 = require('sqlite3').verbose();
+// 使用相对路径导入sqlite3模块以解决Electron环境下的模块查找问题
+const sqlite3 = require('../../desktop/node_modules/sqlite3').verbose();
 const path = require('path');
 
 class LocalDatabase {
@@ -149,6 +150,18 @@ class LocalDatabase {
         cloud_sync_time TEXT,
         sync_status INTEGER DEFAULT 0,
         error_message TEXT
+      )`,
+
+      // 结果表 - 用于存储排座结果数据
+      `CREATE TABLE IF NOT EXISTS results (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        result_id TEXT UNIQUE NOT NULL,
+        session_id TEXT NOT NULL,
+        data TEXT,
+        status TEXT DEFAULT 'pending',
+        create_time TEXT DEFAULT CURRENT_TIMESTAMP,
+        update_time TEXT DEFAULT CURRENT_TIMESTAMP,
+        sync_status INTEGER DEFAULT 0
       )`
     ];
 
