@@ -1,0 +1,10 @@
+{
+  "name": "cloud-utils",
+  "version": "1.0.0",
+  "description": "云函数共享工具模块",
+  "main": "databaseSecurity.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.4.0"
+  },
+  "private": true
+}
